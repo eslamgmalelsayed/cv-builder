@@ -323,19 +323,30 @@ export function CVBuilder() {
                             language={language}
                             cvData={cvData}
                           />
-                          
+
                           {/* Debug: Show current data and fix button */}
-                          {process.env.NODE_ENV === 'development' && (
+                          {process.env.NODE_ENV === "development" && (
                             <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
-                              <p><strong>Debug Info:</strong></p>
+                              <p>
+                                <strong>Debug Info:</strong>
+                              </p>
                               <p>Title: "{cvData.personalInfo.title}"</p>
-                              <p>Has title field: {cvData.personalInfo.hasOwnProperty('title') ? 'Yes' : 'No'}</p>
+                              <p>
+                                Has title field:{" "}
+                                {cvData.personalInfo.hasOwnProperty("title")
+                                  ? "Yes"
+                                  : "No"}
+                              </p>
                               {!cvData.personalInfo.title && (
-                                <button 
+                                <button
                                   onClick={() => {
-                                    const newPersonalInfo = { ...cvData.personalInfo };
-                                    if (!newPersonalInfo.hasOwnProperty('title')) {
-                                      newPersonalInfo.title = '';
+                                    const newPersonalInfo = {
+                                      ...cvData.personalInfo,
+                                    };
+                                    if (
+                                      !newPersonalInfo.hasOwnProperty("title")
+                                    ) {
+                                      newPersonalInfo.title = "";
                                     }
                                     updatePersonalInfo(newPersonalInfo);
                                   }}

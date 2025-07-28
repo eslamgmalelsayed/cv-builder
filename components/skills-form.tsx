@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
 import type { CVData } from "./cv-builder";
+import { useCVData } from "@/hooks/use-cv-data";
 
 interface SkillsFormProps {
   data: CVData["skills"];
@@ -72,6 +73,7 @@ export function SkillsForm({
   onChange,
   language = "en",
 }: SkillsFormProps) {
+  const { saveOnBlur } = useCVData();
   const [newSkill, setNewSkill] = useState({
     technical: "",
     soft: "",
@@ -140,6 +142,7 @@ export function SkillsForm({
           <Input
             value={newSkill[category]}
             onChange={(e) => handleInputChange(category, e.target.value)}
+            onBlur={saveOnBlur}
             onKeyDown={(e) => handleKeyPress(e, category)}
             placeholder={placeholder}
             className="input-clean"

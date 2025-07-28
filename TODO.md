@@ -13,3 +13,7 @@
 ## Key Improvements Needed auto ai fixes
 
 ## jobs finder
+
+## add global loader
+
+## ai response rely on input name

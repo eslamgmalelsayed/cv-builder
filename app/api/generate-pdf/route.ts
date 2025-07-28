@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
       printBackground: true,
       margin: {
         top: "8mm",
-        right: "10mm",
+        right: "8mm",
         bottom: "8mm",
-        left: "10mm",
+        left: "8mm",
       },
       displayHeaderFooter: false,
       preferCSSPageSize: true,

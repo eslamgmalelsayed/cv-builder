@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import type { CVData } from "./cv-builder";
+import { useCVData } from "@/hooks/use-cv-data";
 
 interface EducationFormProps {
   data: CVData["education"];
@@ -53,6 +54,7 @@ export function EducationForm({
   onChange,
   language = "en",
 }: EducationFormProps) {
+  const { saveOnBlur } = useCVData();
   const t = translations[language];
 
   const addEducation = () => {
@@ -122,6 +124,7 @@ export function EducationForm({
                   onChange={(e) =>
                     updateEducation(edu.id, "degree", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.degreePlaceholder}
                   className="input-clean"
                 />
@@ -133,6 +136,7 @@ export function EducationForm({
                   onChange={(e) =>
                     updateEducation(edu.id, "institution", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.institutionPlaceholder}
                   className="input-clean"
                 />
@@ -147,6 +151,7 @@ export function EducationForm({
                   onChange={(e) =>
                     updateEducation(edu.id, "location", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.locationPlaceholder}
                   className="input-clean"
                 />
@@ -159,6 +164,7 @@ export function EducationForm({
                   onChange={(e) =>
                     updateEducation(edu.id, "graduationDate", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   className="input-clean w-full"
                 />
               </div>
@@ -169,6 +175,7 @@ export function EducationForm({
                   onChange={(e) =>
                     updateEducation(edu.id, "gpa", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.gpaPlaceholder}
                   className="input-clean"
                 />

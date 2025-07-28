@@ -397,6 +397,22 @@ export function useCVData() {
     return "unsaved";
   }, [isSaving, lastSaveTime]);
 
+  // Blur save function for immediate localStorage updates
+  const saveOnBlur = useCallback(() => {
+    if (!isLoaded) return;
+
+    try {
+      const stateToSave: CVState = {
+        ...state,
+        lastSaved: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      setLastSaveTime(new Date());
+    } catch (error) {
+      console.error("Error saving CV data to localStorage on blur:", error);
+    }
+  }, [state, isLoaded]);
+
   return {
     // State
     state,
@@ -433,5 +449,6 @@ export function useCVData() {
     // Utility functions
     clearAllData,
     getSaveStatus,
+    saveOnBlur,
   };
 }

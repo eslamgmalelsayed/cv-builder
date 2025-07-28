@@ -19,8 +19,11 @@ const SuggestionSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  let language = "en"; // Default language
+  
   try {
-    const { cvData, jobDescription, language = "en" } = await request.json()
+    const { cvData, jobDescription, language: requestLanguage = "en" } = await request.json()
+    language = requestLanguage; // Set the actual language from request
 
     // Create language-specific prompts
     const isArabic = language === "ar"

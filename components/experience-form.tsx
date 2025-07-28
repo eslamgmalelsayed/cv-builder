@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import type { CVData } from "./cv-builder";
+import { useCVData } from "@/hooks/use-cv-data";
 
 interface ExperienceFormProps {
   data: CVData["experience"];
@@ -83,6 +84,7 @@ export function ExperienceForm({
   language = "en",
   cvData,
 }: ExperienceFormProps) {
+  const { saveOnBlur } = useCVData();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempDescriptions, setTempDescriptions] = useState<
     Record<string, string>
@@ -237,6 +239,7 @@ export function ExperienceForm({
                   onChange={(e) =>
                     updateExperienceField(exp.id, "jobTitle", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.jobTitlePlaceholder}
                   className="input-clean"
                   field="job-title"
@@ -251,6 +254,7 @@ export function ExperienceForm({
                   onChange={(e) =>
                     updateExperienceField(exp.id, "company", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.companyPlaceholder}
                   className="input-clean"
                 />
@@ -265,6 +269,7 @@ export function ExperienceForm({
                   onChange={(e) =>
                     updateExperienceField(exp.id, "location", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   placeholder={t.locationPlaceholder}
                   className="input-clean"
                 />
@@ -277,6 +282,7 @@ export function ExperienceForm({
                   onChange={(e) =>
                     updateExperienceField(exp.id, "startDate", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   className="input-clean w-full"
                 />
               </div>
@@ -288,6 +294,7 @@ export function ExperienceForm({
                   onChange={(e) =>
                     updateExperienceField(exp.id, "endDate", e.target.value)
                   }
+                  onBlur={saveOnBlur}
                   disabled={exp.current}
                   className="input-clean w-full"
                 />
@@ -345,6 +352,7 @@ export function ExperienceForm({
                     onChange={(e) =>
                       handleDescriptionChange(exp.id, e.target.value)
                     }
+                    onBlur={saveOnBlur}
                     onKeyDown={(e) => handleDescriptionKeyDown(e, exp.id)}
                     placeholder={t.descriptionPlaceholder}
                     rows={6}

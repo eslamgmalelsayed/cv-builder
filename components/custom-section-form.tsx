@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, Edit2, Save } from "lucide-react";
 import type { CustomSection } from "./cv-builder";
+import { useCVData } from "@/hooks/use-cv-data";
 
 interface CustomSectionFormProps {
   data: CustomSection[];
@@ -69,6 +70,7 @@ export function CustomSectionForm({
   editingId: externalEditingId,
   onEditingChange,
 }: CustomSectionFormProps) {
+  const { saveOnBlur } = useCVData();
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(
     externalEditingId || null
@@ -152,6 +154,7 @@ export function CustomSectionForm({
                 onChange={(e) =>
                   setNewSection({ ...newSection, title: e.target.value })
                 }
+                onBlur={saveOnBlur}
                 placeholder={t.sectionTitlePlaceholder}
                 className="input-clean"
               />
@@ -164,6 +167,7 @@ export function CustomSectionForm({
                 onChange={(e) =>
                   setNewSection({ ...newSection, content: e.target.value })
                 }
+                onBlur={saveOnBlur}
                 placeholder={t.contentPlaceholder}
                 rows={4}
                 className="textarea-clean font-mono text-sm"
@@ -234,6 +238,7 @@ export function CustomSectionForm({
                     onChange={(e) =>
                       handleUpdateSection(section.id, { title: e.target.value })
                     }
+                    onBlur={saveOnBlur}
                     className="input-clean"
                   />
                 </div>
@@ -247,6 +252,7 @@ export function CustomSectionForm({
                         content: e.target.value,
                       })
                     }
+                    onBlur={saveOnBlur}
                     rows={4}
                     className="textarea-clean font-mono text-sm"
                   />
