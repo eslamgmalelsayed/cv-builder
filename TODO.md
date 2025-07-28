@@ -17,3 +17,5 @@
 ## add global loader
 
 ## ai response rely on input name
+
+## pdf bullets hidden

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { AIInput, AITextarea } from "@/components/ui/ai-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,15 +73,15 @@ export function PersonalInfoForm({
   const { saveOnBlur } = useCVData();
 
   // Ensure title field exists and initialize it properly
-  const safeData = { ...data };
-  if (!safeData.hasOwnProperty("title")) {
-    safeData.title = "";
-    // Update the parent with the corrected data
-    onChange(safeData);
-  }
+  useEffect(() => {
+    if (!data.hasOwnProperty("title") || data.title === undefined) {
+      const updatedData = { ...data, title: "" };
+      onChange(updatedData);
+    }
+  }, []); // Only run once on mount
 
   const handleChange = (field: keyof CVData["personalInfo"], value: string) => {
-    const updatedData = { ...safeData, [field]: value };
+    const updatedData = { ...data, [field]: value };
     onChange(updatedData);
   };
 
@@ -96,7 +97,7 @@ export function PersonalInfoForm({
           </Label>
           <AIInput
             id="fullName"
-            value={safeData.fullName}
+            value={data.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
             onBlur={saveOnBlur}
             placeholder={t.fullNamePlaceholder}
@@ -113,7 +114,7 @@ export function PersonalInfoForm({
           </Label>
           <AIInput
             id="title"
-            value={safeData.title || ""}
+            value={data.title || ""}
             onChange={(e) => handleChange("title", e.target.value)}
             onBlur={saveOnBlur}
             placeholder={t.titlePlaceholder}

@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { generateObject } from "ai"
-import { groq } from "@ai-sdk/groq"
-import { z } from "zod"
+import { type NextRequest, NextResponse } from "next/server";
+import { generateObject } from "ai";
+import { groq } from "@ai-sdk/groq";
+import { z } from "zod";
 
 const SuggestionSchema = z.object({
   suggestions: z.array(
@@ -12,21 +12,25 @@ const SuggestionSchema = z.object({
       description: z.string(),
       section: z.string(),
       applied: z.boolean().default(false),
-    }),
+    })
   ),
   atsScore: z.number().min(0).max(100),
   overallFeedback: z.string(),
-})
+});
 
 export async function POST(request: NextRequest) {
   let language = "en"; // Default language
-  
+
   try {
-    const { cvData, jobDescription, language: requestLanguage = "en" } = await request.json()
+    const {
+      cvData,
+      jobDescription,
+      language: requestLanguage = "en",
+    } = await request.json();
     language = requestLanguage; // Set the actual language from request
 
     // Create language-specific prompts
-    const isArabic = language === "ar"
+    const isArabic = language === "ar";
 
     const basePrompt = isArabic
       ? `
@@ -104,10 +108,14 @@ FOCUS AREAS:
 - Professional summary optimization
 - Skills section keyword density
 - Experience descriptions with measurable results
-${jobDescription ? "- Alignment with the provided job description requirements" : ""}
+${
+  jobDescription
+    ? "- Alignment with the provided job description requirements"
+    : ""
+}
 
 IMPORTANT: Return suggestions with string IDs (like "1", "2", "3", etc.) and ensure each suggestion is specific and actionable.
-`
+`;
 
     const responseFormat = isArabic
       ? `
@@ -143,23 +151,23 @@ Please return your response in the following JSON format:
   "atsScore": 75,
   "overallFeedback": "Overall assessment..."
 }
-`
+`;
 
-    const prompt = basePrompt + responseFormat
+    const prompt = basePrompt + responseFormat;
 
     const result = await generateObject({
       model: groq("llama-3.1-8b-instant"),
       schema: SuggestionSchema,
       prompt,
       temperature: 0.7,
-    })
+    });
 
-    return NextResponse.json(result.object)
+    return NextResponse.json(result.object);
   } catch (error) {
-    console.error("Error generating AI suggestions:", error)
+    console.error("Error generating AI suggestions:", error);
 
     // Return language-specific fallback response
-    const isArabic = language === "ar"
+    const isArabic = language === "ar";
 
     const fallbackResponse = {
       suggestions: isArabic
@@ -177,7 +185,8 @@ Please return your response in the following JSON format:
               id: "2",
               type: "keyword" as const,
               title: "تحسين الكلمات المفتاحية",
-              description: "أضف كلمات مفتاحية خاصة بالصناعة ومهارات تقنية توجد عادة في أوصاف الوظائف في مجالك.",
+              description:
+                "أضف كلمات مفتاحية خاصة بالصناعة ومهارات تقنية توجد عادة في أوصاف الوظائف في مجالك.",
               section: "المهارات",
               applied: false,
             },
@@ -185,7 +194,8 @@ Please return your response in the following JSON format:
               id: "3",
               type: "format" as const,
               title: "تحسين الملخص المهني",
-              description: "تأكد من أن ملخصك المهني يتكون من 2-3 جمل ويتضمن سنوات خبرتك والتخصصات الرئيسية.",
+              description:
+                "تأكد من أن ملخصك المهني يتكون من 2-3 جمل ويتضمن سنوات خبرتك والتخصصات الرئيسية.",
               section: "المعلومات الشخصية",
               applied: false,
             },
@@ -193,7 +203,8 @@ Please return your response in the following JSON format:
               id: "4",
               type: "improvement" as const,
               title: "استخدام أفعال العمل",
-              description: "ابدأ كل نقطة في قسم الخبرة بأفعال عمل قوية مثل 'تطوير'، 'إدارة'، 'تنفيذ'، أو 'تحقيق'.",
+              description:
+                "ابدأ كل نقطة في قسم الخبرة بأفعال عمل قوية مثل 'تطوير'، 'إدارة'، 'تنفيذ'، أو 'تحقيق'.",
               section: "الخبرة",
               applied: false,
             },
@@ -258,8 +269,8 @@ Please return your response in the following JSON format:
       overallFeedback: isArabic
         ? "سيرتك الذاتية لها هيكل جيد ولكن يمكن أن تستفيد من المزيد من الإنجازات القابلة للقياس والكلمات المفتاحية الخاصة بالصناعة. ركز على إضافة المقاييس إلى قسم الخبرة وتحسين مهاراتك لأنظمة ATS."
         : "Your CV has good structure but could benefit from more quantifiable achievements and industry-specific keywords. Focus on adding metrics to your experience section and optimizing your skills for ATS systems.",
-    }
+    };
 
-    return NextResponse.json(fallbackResponse)
+    return NextResponse.json(fallbackResponse);
   }
 }
