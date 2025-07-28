@@ -122,10 +122,15 @@ export function CVPreview({
       <CardContent className="p-8 bg-white cv-preview" dir={direction}>
         {/* Header */}
         <div className="border-b-2 border-primary pb-6 mb-6">
-          <h1 className="text-3xl font-bold text-primary mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-1">
             {data.personalInfo.fullName ||
               (language === "ar" ? "اسمك" : "Your Name")}
           </h1>
+          {data.personalInfo.title && data.personalInfo.title.trim() && (
+            <h2 className="text-xl font-medium text-gray-700 mb-3">
+              {data.personalInfo.title}
+            </h2>
+          )}
 
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 justify-start">
             {data.personalInfo.email && (

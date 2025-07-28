@@ -17,6 +17,8 @@ const translations = {
   en: {
     fullName: "Full Name *",
     fullNamePlaceholder: "John Doe",
+    title: "Job Title/Position *",
+    titlePlaceholder: "Software Engineer",
     email: "Email *",
     emailPlaceholder: "john.doe@email.com",
     phone: "Phone Number",
@@ -38,6 +40,8 @@ const translations = {
   ar: {
     fullName: "الاسم الكامل *",
     fullNamePlaceholder: "أحمد محمد",
+    title: "المسمى الوظيفي *",
+    titlePlaceholder: "مهندس برمجيات",
     email: "البريد الإلكتروني *",
     emailPlaceholder: "ahmed.mohamed@email.com",
     phone: "رقم الهاتف",
@@ -64,8 +68,17 @@ export function PersonalInfoForm({
   language = "en",
   cvData,
 }: PersonalInfoFormProps) {
+  // Ensure title field exists and initialize it properly
+  const safeData = { ...data };
+  if (!safeData.hasOwnProperty('title')) {
+    safeData.title = '';
+    // Update the parent with the corrected data
+    onChange(safeData);
+  }
+
   const handleChange = (field: keyof CVData["personalInfo"], value: string) => {
-    onChange({ ...data, [field]: value });
+    const updatedData = { ...safeData, [field]: value };
+    onChange(updatedData);
   };
 
   const t = translations[language];
@@ -80,7 +93,7 @@ export function PersonalInfoForm({
           </Label>
           <AIInput
             id="fullName"
-            value={data.fullName}
+            value={safeData.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
             placeholder={t.fullNamePlaceholder}
             className={`input-clean ${isRTL ? "text-right" : ""}`}
@@ -90,6 +103,25 @@ export function PersonalInfoForm({
             language={language}
           />
         </div>
+        <div className={isRTL ? "text-right" : ""}>
+          <Label htmlFor="title" className={isRTL ? "text-right block" : ""}>
+            {t.title}
+          </Label>
+          <AIInput
+            id="title"
+            value={safeData.title || ''}
+            onChange={(e) => handleChange("title", e.target.value)}
+            placeholder={t.titlePlaceholder}
+            className={`input-clean ${isRTL ? "text-right" : ""}`}
+            style={isRTL ? { textAlign: "right" } : {}}
+            field="personal-title"
+            context={cvData}
+            language={language}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className={isRTL ? "text-right" : ""}>
           <Label htmlFor="email" className={isRTL ? "text-right block" : ""}>
             {t.email}

@@ -471,3 +471,46 @@ textarea:disabled {
     transform: translateY(0);
   }
 }
+
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .language-switcher {
+  left: 1rem;
+  right: auto;
+}
+
+[dir="ltr"] .language-switcher {
+  right: 1rem;
+  left: auto;
+}
+
+/* Responsive RTL adjustments */
+@media (max-width: 768px) {
+  [dir="rtl"] .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-center {
+    text-align: center;
+  }
+}
+
+/* Fix for Arabic font rendering */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] p {
+  font-feature-settings: "kern" 1, "liga" 1;
+}

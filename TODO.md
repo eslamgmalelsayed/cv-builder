@@ -11,3 +11,5 @@
 ## add DB and auth
 
 ## Key Improvements Needed auto ai fixes
+
+## jobs finder

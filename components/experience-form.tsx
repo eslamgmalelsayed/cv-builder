@@ -111,16 +111,13 @@ export function ExperienceForm({
     field: string,
     value: string | boolean
   ) => {
-    console.log("updateExperienceField called:", { id, field, value });
     const updatedData = data.map((exp) => {
       if (exp.id === id) {
         const updated = { ...exp, [field]: value };
-        console.log("Updated experience:", updated);
         return updated;
       }
       return exp;
     });
-    console.log("Calling onChange with:", updatedData);
     onChange(updatedData);
   };
 
@@ -300,19 +297,18 @@ export function ExperienceForm({
                     id={`current-${exp.id}`}
                     checked={exp.current === true}
                     onChange={(e) => {
-                      console.log("Native checkbox changed:", {
-                        expId: exp.id,
-                        currentValue: exp.current,
-                        newValue: e.target.checked,
+                      const updatedData = data.map((experience) => {
+                        if (experience.id === exp.id) {
+                          return {
+                            ...experience,
+                            current: e.target.checked,
+                            endDate: e.target.checked ? "" : experience.endDate,
+                          };
+                        }
+                        return experience;
                       });
-                      updateExperienceField(
-                        exp.id,
-                        "current",
-                        e.target.checked
-                      );
-                      if (e.target.checked) {
-                        updateExperienceField(exp.id, "endDate", "");
-                      }
+
+                      onChange(updatedData);
                     }}
                     className="rounded border-gray-300"
                   />

@@ -1,83 +1,114 @@
-import Link from "next/link";
-import { ArrowRight, Sparkles, Zap, FileText, Brain } from "lucide-react";
-import type { Metadata } from "next";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { RetroGrid } from "@/components/ui/retro-grid";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Free ATS-Compliant CV Builder",
-  description:
-    "Create professional, ATS-optimized resumes with our free CV builder. AI-powered suggestions, drag-and-drop sections, and instant PDF export. Build your perfect resume in minutes.",
-  openGraph: {
-    title: "Free ATS-Compliant CV Builder | Professional Resume Maker",
-    description:
-      "Create professional, ATS-optimized resumes with AI-powered suggestions. Free online CV builder with drag-and-drop sections and instant PDF export.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "CV Builder - Create Professional ATS-Compliant Resumes",
-      },
-    ],
-  },
-};
+import Link from "next/link";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { ArrowRight, Sparkles, Zap, FileText, Brain } from "lucide-react";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { WarpBackground } from "@/components/ui/warp-background";
+import { Header } from "@/components/ui/header";
+import { homePageContent, type HomePageContent } from "@/lib/content";
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <RetroGrid className="absolute inset-0" />
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [content, setContent] = useState<HomePageContent>(homePageContent.en);
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-center">
+  useEffect(() => {
+    // Check for saved language preference
+    const savedLang = localStorage.getItem("preferred-language") || "en";
+    setCurrentLanguage(savedLang);
+    setContent(homePageContent[savedLang] || homePageContent.en);
+  }, []);
+
+  const handleLanguageChange = (language: { code: string }) => {
+    setCurrentLanguage(language.code);
+    setContent(homePageContent[language.code] || homePageContent.en);
+  };
+  return (
+    <div
+      className={`min-h-screen bg-background ${
+        currentLanguage === "ar" ? "rtl" : "ltr"
+      }`}
+      dir={currentLanguage === "ar" ? "rtl" : "ltr"}
+    >
+      <Header
+        currentLanguage={currentLanguage}
+        onLanguageChange={handleLanguageChange}
+        showLanguageSwitcher={true}
+      />
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <WarpBackground
+          className="absolute inset-0 border-none p-0"
+          perspective={200}
+          beamsPerSide={5}
+          beamSize={3}
+          beamDelayMax={2}
+          beamDelayMin={0.5}
+          beamDuration={4}
+        >
+          <div />
+        </WarpBackground>
+
+        <div
+          className={`relative z-10 container mx-auto px-4 py-20 ${
+            currentLanguage === "ar" ? "text-center" : "text-center"
+          }`}
+        >
           <div className="space-y-8">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              AI-Powered Resume Builder
+              {content.hero.badge}
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+            <h1
+              className={`text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight ${
+                currentLanguage === "ar" ? "leading-normal" : ""
+              }`}
+            >
               <span className="bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 bg-clip-text text-transparent dark:from-white dark:via-gray-300 dark:to-white">
-                Build Your Perfect
+                {content.hero.title}
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Resume in Minutes
+                {content.hero.subtitle}
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Create professional, ATS-optimized resumes with AI-powered
-              suggestions, real-time autocompletion, and comprehensive ATS
-              scoring.
+            <p
+              className={`text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed ${
+                currentLanguage === "ar" ? "text-center" : ""
+              }`}
+            >
+              {content.hero.description}
             </p>
 
             {/* Features Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-2 h-2 bg-green-500 rounded-full" />
-                100% Free
+                {content.features.badges.free}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                ATS-Compliant
+                {content.features.badges.atsCompliant}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                AI-Powered
+                {content.features.badges.aiPowered}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                Instant PDF
+                {content.features.badges.instantPdf}
               </div>
             </div>
 
             {/* CTA Button */}
-            <div className="pt-8">
+            <div className="pt-8 flex justify-center">
               <Link href="/builder">
                 <ShimmerButton
                   className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-none"
@@ -85,8 +116,12 @@ export default function Home() {
                   shimmerDuration="2s"
                 >
                   <span className="flex items-center gap-2 font-semibold">
-                    Start Building Your CV
-                    <ArrowRight className="w-5 h-5" />
+                    {content.hero.primaryButton}
+                    <ArrowRight
+                      className={`w-5 h-5 ${
+                        currentLanguage === "ar" ? "rotate-180" : ""
+                      }`}
+                    />
                   </span>
                 </ShimmerButton>
               </Link>
@@ -94,8 +129,7 @@ export default function Home() {
 
             {/* Trust Indicators */}
             <p className="text-sm text-muted-foreground">
-              Join thousands of job seekers who have successfully landed
-              interviews
+              {content.hero.trustIndicator}
             </p>
           </div>
         </div>
@@ -103,116 +137,91 @@ export default function Home() {
 
       {/* Features Section */}
       <section className="py-24 bg-muted/50">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Powered by Advanced AI Technology
+              {content.features.title}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our intelligent CV builder combines cutting-edge AI with proven
-              ATS optimization to help you create resumes that get noticed.
+              {content.features.subtitle}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group relative p-8 bg-background rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mb-4">
-                  <Brain className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  AI Autocompletion
-                </h3>
-                <p className="text-muted-foreground">
-                  Smart suggestions appear as you type, helping you craft
-                  compelling content with context-aware AI recommendations.
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            {content.features.items.slice(0, 3).map((feature, index) => {
+              const icons = [Brain, Zap, FileText];
+              const colors = ["blue", "green", "purple"];
+              const Icon = icons[index];
+              const color = colors[index];
 
-            <div className="group relative p-8 bg-background rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-green-600 dark:text-green-400" />
+              return (
+                <div
+                  key={index}
+                  className="group relative p-8 bg-background rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="mb-6">
+                    <div
+                      className={`w-12 h-12 bg-${color}-100 dark:bg-${color}-900/20 rounded-lg flex items-center justify-center mb-4`}
+                    >
+                      <Icon
+                        className={`w-6 h-6 text-${color}-600 dark:text-${color}-400`}
+                      />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </div>
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-r from-${color}-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity`}
+                  />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">ATS Optimization</h3>
-                <p className="text-muted-foreground">
-                  Get detailed ATS scores and improvement suggestions to ensure
-                  your resume passes through automated screening systems.
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-
-            <div className="group relative p-8 bg-background rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mb-4">
-                  <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  Smart Chat Assistant
-                </h3>
-                <p className="text-muted-foreground">
-                  Get personalized career advice and CV improvement tips from
-                  our AI assistant trained on industry best practices.
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Benefits Section */}
       <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Why Choose Our CV Builder?
+                {content.benefits.title}
               </h2>
               <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 bg-green-600 rounded-full" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">
-                      Real-time AI Assistance
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Get instant suggestions and improvements as you build your
-                      resume, powered by advanced language models.
-                    </p>
-                  </div>
-                </div>
+                {content.benefits.items.map((benefit, index) => {
+                  const colors = ["green", "blue", "purple", "orange"];
+                  const color = colors[index % colors.length];
 
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">ATS Score Analysis</h3>
-                    <p className="text-muted-foreground">
-                      Understand exactly how your resume performs against ATS
-                      systems with detailed scoring and recommendations.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <div className="w-2 h-2 bg-purple-600 rounded-full" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">Professional Export</h3>
-                    <p className="text-muted-foreground">
-                      Generate polished PDF resumes that maintain formatting and
-                      look great across all devices and platforms.
-                    </p>
-                  </div>
-                </div>
+                  return (
+                    <div
+                      key={index}
+                      className={`flex gap-4 ${
+                        currentLanguage === "ar" ? "flex-row-reverse" : ""
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 bg-${color}-100 dark:bg-${color}-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1`}
+                      >
+                        <div
+                          className={`w-2 h-2 bg-${color}-600 rounded-full`}
+                        />
+                      </div>
+                      <div
+                        className={currentLanguage === "ar" ? "text-right" : ""}
+                      >
+                        <h3 className="font-semibold mb-2">{benefit.title}</h3>
+                        <p className="text-muted-foreground">
+                          {benefit.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -245,40 +254,45 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-24 bg-muted/50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Build Your Perfect Resume?
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of job seekers who have successfully created
-            professional resumes with our AI-powered builder.
-          </p>
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              {content.cta.title}
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              {content.cta.description}
+            </p>
 
-          <Link href="/builder">
-            <ShimmerButton
-              className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-none"
-              shimmerColor="#ffffff"
-              shimmerDuration="2s"
-            >
-              <span className="flex items-center gap-2 font-semibold">
-                Get Started for Free
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            </ShimmerButton>
-          </Link>
+            <div className="flex justify-center">
+              <Link href="/builder">
+                <ShimmerButton
+                  className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-none"
+                  shimmerColor="#ffffff"
+                  shimmerDuration="2s"
+                >
+                  <span className="flex items-center gap-2 font-semibold">
+                    {content.cta.button}
+                    <ArrowRight
+                      className={`w-5 h-5 ${
+                        currentLanguage === "ar" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </span>
+                </ShimmerButton>
+              </Link>
+            </div>
 
-          <p className="text-sm text-muted-foreground mt-4">
-            No registration required • Free forever • Professional results
-          </p>
+            <p className="text-sm text-muted-foreground mt-4">
+              {content.cta.disclaimer}
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-background border-t py-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            &copy; 2024 CV Builder. Built with ❤️ for job seekers worldwide.
-          </p>
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-muted-foreground">{content.footer.copyright}</p>
         </div>
       </footer>
     </div>

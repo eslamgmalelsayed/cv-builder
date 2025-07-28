@@ -1,0 +1,136 @@
+/* RTL Support Styles */
+
+/* Apply Cairo font for RTL languages */
+[dir="rtl"] body {
+  font-family: var(--font-cairo), Cairo, sans-serif;
+}
+
+[dir="ltr"] body {
+  font-family: var(--font-inter), Inter, sans-serif;
+}
+
+/* RTL-specific adjustments */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .flex-col {
+  flex-direction: column;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+[dir="rtl"] .gap-2 {
+  gap: 0.5rem;
+}
+
+[dir="rtl"] .gap-4 {
+  gap: 1rem;
+}
+
+/* Positioning adjustments for RTL */
+[dir="rtl"] .right-4 {
+  right: auto;
+  left: 1rem;
+}
+
+[dir="rtl"] .left-4 {
+  left: auto;
+  right: 1rem;
+}
+
+/* Button icon positioning for RTL */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Language switcher positioning */
+[dir="rtl"] .language-switcher {
+  left: 1rem;
+  right: auto;
+}
+
+[dir="ltr"] .language-switcher {
+  right: 1rem;
+  left: auto;
+}
+
+/* Text alignment overrides */
+.text-center {
+  text-align: center !important;
+}
+
+/* Grid layout adjustments for RTL */
+[dir="rtl"] .grid {
+  direction: ltr;
+}
+
+[dir="rtl"] .grid > * {
+  direction: rtl;
+}
+
+/* Responsive RTL adjustments */
+@media (min-width: 640px) {
+  [dir="rtl"] .sm\\:flex-row {
+    flex-direction: row-reverse;
+  }
+}
+
+/* Animation adjustments for RTL */
+[dir="rtl"] .animate-shimmer-slide {
+  animation-direction: reverse;
+}
+
+/* Ensure proper text rendering for Arabic */
+[dir="rtl"] {
+  font-feature-settings: "liga" on, "calt" on;
+}
+
+/* Fix any margin/padding issues in RTL */
+[dir="rtl"] .mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .pl-4 {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+[dir="rtl"] .pr-4 {
+  padding-right: 0;
+  padding-left: 1rem;
+}
+
+/* Special case for badges and inline elements */
+[dir="rtl"] .inline-flex {
+  direction: ltr;
+}
+
+[dir="rtl"] .inline-flex > * {
+  direction: rtl;
+}

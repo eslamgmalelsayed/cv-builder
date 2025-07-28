@@ -10,7 +10,6 @@ import { EducationForm } from "./education-form";
 import { SkillsForm } from "./skills-form";
 import { CustomSectionForm } from "./custom-section-form";
 import { CVPreview } from "./cv-preview";
-import { AIAssistant } from "./ai-assistant";
 import { ATSScore } from "./ats-score";
 import { ThemeCustomizer } from "./theme-customizer";
 import { SaveStatus } from "./save-status";
@@ -38,6 +37,7 @@ export interface CustomSection {
 export interface CVData {
   personalInfo: {
     fullName: string;
+    title: string;
     email: string;
     phone: string;
     location: string;
@@ -133,7 +133,6 @@ export function CVBuilder() {
     updateDirection,
     updateLanguage,
     updateThemeColor,
-    updateCVData,
 
     // Utility functions
     getSaveStatus,
@@ -146,25 +145,6 @@ export function CVBuilder() {
   >(null);
   const [activeTab, setActiveTab] = useState("personalInfo");
   const { showConfirm, AlertModalComponent } = useAlertModal();
-
-  const handleEditCustomSection = (sectionId: string) => {
-    setEditingCustomSection(sectionId);
-    setActiveTab("customSections");
-  };
-
-  const handleDeleteCustomSection = (sectionId: string) => {
-    showConfirm(
-      language === "ar" ? "تأكيد الحذف" : "Confirm Delete",
-      language === "ar"
-        ? "هل أنت متأكد من حذف هذا القسم؟"
-        : "Are you sure you want to delete this section?",
-      () => {
-        removeCustomSection(sectionId);
-      },
-      language === "ar" ? "حذف" : "Delete",
-      language === "ar" ? "إلغاء" : "Cancel"
-    );
-  };
 
   // Apply theme and language settings on load and when clearTrigger changes
   useEffect(() => {
@@ -285,13 +265,7 @@ export function CVBuilder() {
           {t.atsScore}
         </Button>
         <div className="w-full sm:w-auto">
-          <PDFExportButton
-            cvData={cvData}
-            sectionOrder={sectionOrder}
-            visibleSections={visibleSections}
-            sectionNames={sectionNames}
-            language={language}
-          />
+          <PDFExportButton cvData={cvData} />
         </div>
       </div>
 
@@ -349,6 +323,29 @@ export function CVBuilder() {
                             language={language}
                             cvData={cvData}
                           />
+                          
+                          {/* Debug: Show current data and fix button */}
+                          {process.env.NODE_ENV === 'development' && (
+                            <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
+                              <p><strong>Debug Info:</strong></p>
+                              <p>Title: "{cvData.personalInfo.title}"</p>
+                              <p>Has title field: {cvData.personalInfo.hasOwnProperty('title') ? 'Yes' : 'No'}</p>
+                              {!cvData.personalInfo.title && (
+                                <button 
+                                  onClick={() => {
+                                    const newPersonalInfo = { ...cvData.personalInfo };
+                                    if (!newPersonalInfo.hasOwnProperty('title')) {
+                                      newPersonalInfo.title = '';
+                                    }
+                                    updatePersonalInfo(newPersonalInfo);
+                                  }}
+                                  className="mt-2 px-2 py-1 bg-blue-500 text-white rounded text-xs"
+                                >
+                                  Refresh Title Field
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </TabsContent>
 
                         <TabsContent value="experience" className="mt-6">
@@ -423,8 +420,6 @@ export function CVBuilder() {
               sectionNames={sectionNames}
               direction={direction}
               language={language}
-              onEditCustomSection={handleEditCustomSection}
-              onDeleteCustomSection={handleDeleteCustomSection}
               isPreviewMode={false}
             />
           </div>

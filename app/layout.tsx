@@ -1,20 +1,21 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter, Cairo } from "next/font/google"
-import "./globals.css"
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Cairo } from "next/font/google";
+import "./globals.css";
+import "../styles/rtl.css";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
   weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-cairo",
   display: "swap",
-})
+});
 
 export const metadata: Metadata = {
-  title: "Free ATS-Compliant CV Builder | Professional Resume Maker Online",
+  title: "CVIFI - Free ATS-Compliant CV Builder | Professional Resume Maker",
   description:
-    "Create professional, ATS-optimized resumes with our free CV builder. AI-powered suggestions, drag-and-drop sections, and instant PDF export. Build your perfect resume in minutes.",
+    "Create professional, ATS-optimized resumes with CVIFI. AI-powered suggestions, drag-and-drop sections, and instant PDF export. Build your perfect resume in minutes.",
   keywords: [
     "CV builder",
     "resume builder",
@@ -34,9 +35,9 @@ export const metadata: Metadata = {
     "Arabic CV builder",
     "RTL resume builder",
   ],
-  authors: [{ name: "CV Builder Team" }],
-  creator: "CV Builder",
-  publisher: "CV Builder",
+  authors: [{ name: "CVIFI Team" }],
+  creator: "CVIFI",
+  publisher: "CVIFI",
   formatDetection: {
     email: false,
     address: false,
@@ -51,13 +52,13 @@ export const metadata: Metadata = {
     description:
       "Create professional, ATS-optimized resumes with AI-powered suggestions. Free online CV builder with drag-and-drop sections and instant PDF export.",
     url: "https://cv-builder.vercel.app",
-    siteName: "CV Builder",
+    siteName: "CVIFI",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "CV Builder - Create Professional ATS-Compliant Resumes",
+        alt: "CVIFI - Create Professional ATS-Compliant Resumes",
       },
     ],
     locale: "en_US",
@@ -87,22 +88,22 @@ export const metadata: Metadata = {
     yandex: "your-yandex-verification-code",
     yahoo: "your-yahoo-verification-code",
   },
-    generator: 'v0.dev'
-}
+  generator: "v0.dev",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.png" sizes="32x32" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#3B82F6" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* Preload Cairo font for better performance */}
@@ -119,7 +120,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              name: "CV Builder",
+              name: "CVIFI",
               description:
                 "Free ATS-compliant CV builder with AI-powered suggestions for creating professional resumes",
               url: "https://cv-builder.vercel.app",
@@ -147,7 +148,7 @@ export default function RootLayout({
               softwareVersion: "1.0",
               author: {
                 "@type": "Organization",
-                name: "CV Builder Team",
+                name: "CVIFI Team",
               },
             }),
           }}
@@ -198,7 +199,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${cairo.variable}`}>{children}</body>
+      <body className={`${inter.className} ${cairo.variable} font-inter`}>
+        {children}
+      </body>
     </html>
-  )
+  );
 }

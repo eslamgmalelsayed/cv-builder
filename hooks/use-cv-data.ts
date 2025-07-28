@@ -17,6 +17,7 @@ export interface CVState {
 const defaultCVData: CVData = {
   personalInfo: {
     fullName: "",
+    title: "",
     email: "",
     phone: "",
     location: "",
@@ -40,6 +41,7 @@ const getDefaultState = (): CVState => ({
   cvData: {
     personalInfo: {
       fullName: "",
+      title: "",
       email: "",
       phone: "",
       location: "",
@@ -73,7 +75,7 @@ const getDefaultState = (): CVState => ({
 });
 
 const STORAGE_KEY = "cv-builder-state";
-const AUTO_SAVE_DELAY = 1000; // 1 second
+const AUTO_SAVE_DELAY = 300; // 300ms for faster response
 
 export function useCVData() {
   const [state, setState] = useState<CVState>(getDefaultState());
@@ -97,6 +99,12 @@ export function useCVData() {
           cvData: {
             ...defaultState.cvData,
             ...parsedState.cvData,
+            personalInfo: {
+              ...defaultState.cvData.personalInfo,
+              ...parsedState.cvData.personalInfo,
+              // Ensure title field exists
+              title: parsedState.cvData.personalInfo?.title || "",
+            },
             skills: {
               ...defaultState.cvData.skills,
               ...parsedState.cvData.skills,
@@ -141,46 +149,95 @@ export function useCVData() {
     return () => clearTimeout(timeoutId);
   }, [state, isLoaded]);
 
-  // Update functions
-  const updatePersonalInfo = useCallback(
-    (personalInfo: CVData["personalInfo"]) => {
-      setState((prev) => ({
-        ...prev,
-        cvData: { ...prev.cvData, personalInfo },
-      }));
+  // Immediate save function for critical updates
+  const saveImmediately = useCallback(() => {
+    if (!isLoaded) return;
+
+    try {
+      const stateToSave: CVState = {
+        ...state,
+        lastSaved: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      setLastSaveTime(new Date());
+    } catch (error) {
+      console.error("Error saving CV data to localStorage:", error);
+    }
+  }, [state, isLoaded]);
+
+  // Helper function to update state and save immediately
+  const updateStateAndSave = useCallback(
+    (updater: (prev: CVState) => CVState) => {
+      setState((prev) => {
+        const newState = updater(prev);
+        // Trigger immediate save
+        setTimeout(() => {
+          const stateToSave: CVState = {
+            ...newState,
+            lastSaved: new Date().toISOString(),
+          };
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+            setLastSaveTime(new Date());
+          } catch (error) {
+            console.error("Error saving CV data to localStorage:", error);
+          }
+        }, 0);
+        return newState;
+      });
     },
     []
   );
 
-  const updateExperience = useCallback((experience: CVData["experience"]) => {
-    setState((prev) => ({
-      ...prev,
-      cvData: { ...prev.cvData, experience },
-    }));
-  }, []);
+  // Update functions
+  const updatePersonalInfo = useCallback(
+    (personalInfo: CVData["personalInfo"]) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        cvData: { ...prev.cvData, personalInfo },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateEducation = useCallback((education: CVData["education"]) => {
-    setState((prev) => ({
-      ...prev,
-      cvData: { ...prev.cvData, education },
-    }));
-  }, []);
+  const updateExperience = useCallback(
+    (experience: CVData["experience"]) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        cvData: { ...prev.cvData, experience },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateSkills = useCallback((skills: CVData["skills"]) => {
-    setState((prev) => ({
-      ...prev,
-      cvData: { ...prev.cvData, skills },
-    }));
-  }, []);
+  const updateEducation = useCallback(
+    (education: CVData["education"]) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        cvData: { ...prev.cvData, education },
+      }));
+    },
+    [updateStateAndSave]
+  );
+
+  const updateSkills = useCallback(
+    (skills: CVData["skills"]) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        cvData: { ...prev.cvData, skills },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
   const updateCustomSections = useCallback(
     (customSections: CVData["customSections"]) => {
-      setState((prev) => ({
+      updateStateAndSave((prev) => ({
         ...prev,
         cvData: { ...prev.cvData, customSections },
       }));
     },
-    []
+    [updateStateAndSave]
   );
 
   const addCustomSection = useCallback((section: CustomSection) => {
@@ -223,15 +280,18 @@ export function useCVData() {
     setState((prev) => ({ ...prev, sectionOrder }));
   }, []);
 
-  const toggleSectionVisibility = useCallback((section: string) => {
-    setState((prev) => ({
-      ...prev,
-      visibleSections: {
-        ...prev.visibleSections,
-        [section]: !prev.visibleSections[section],
-      },
-    }));
-  }, []);
+  const toggleSectionVisibility = useCallback(
+    (section: string) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        visibleSections: {
+          ...prev.visibleSections,
+          [section]: !prev.visibleSections[section],
+        },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
   const updateSectionName = useCallback((section: string, name: string) => {
     setState((prev) => ({
