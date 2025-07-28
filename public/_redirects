@@ -1,0 +1,10 @@
+# Redirect old URLs to new ones
+/home / 301
+/cv-builder / 301
+/resume-builder / 301
+
+# API routes for Netlify Functions
+/api/* /.netlify/functions/:splat 200
+
+# Fallback for client-side routing
+/* /index.html 200

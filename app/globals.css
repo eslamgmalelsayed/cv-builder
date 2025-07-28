@@ -1,0 +1,473 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: var(--theme-primary, 222.2 47.4% 11.2%);
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: var(--theme-primary, 222.2 84% 4.9%);
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+
+    /* Theme color presets */
+    --theme-blue: 221 83% 53%;
+    --theme-green: 142 76% 36%;
+    --theme-purple: 262 83% 58%;
+    --theme-red: 0 84% 60%;
+    --theme-orange: 25 95% 53%;
+    --theme-pink: 330 81% 60%;
+    --theme-indigo: 239 84% 67%;
+    --theme-teal: 173 80% 40%;
+    --theme-gray: 215 28% 17%;
+    --theme-black: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: var(--theme-primary, 210 40% 98%);
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: var(--theme-primary, 212.7 26.8% 83.9%);
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Cairo font support using Next.js font optimization */
+  .cairo-font {
+    font-family: var(--font-cairo), "Arial", sans-serif;
+  }
+
+  .cairo-font * {
+    font-family: var(--font-cairo), "Arial", sans-serif;
+  }
+
+  /* RTL Support - Enhanced */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  /* Base RTL text alignment for form elements and general content */
+  [dir="rtl"] input,
+  [dir="rtl"] textarea,
+  [dir="rtl"] select,
+  [dir="rtl"] label,
+  [dir="rtl"] .rtl-text {
+    text-align: right;
+  }
+
+  /* Override specific utility classes when needed */
+  [dir="rtl"] .text-left {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .text-center {
+    text-align: center !important;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: right !important;
+  }
+
+  /* Flexbox utilities - only for specific cases */
+  [dir="rtl"] .rtl-flex-reverse {
+    flex-direction: row-reverse;
+  }
+
+  [dir="rtl"] .rtl-justify-start {
+    justify-content: flex-end;
+  }
+
+  [dir="rtl"] .rtl-justify-end {
+    justify-content: flex-start;
+  }
+
+  /* CV Preview specific RTL styles */
+  [dir="rtl"] .cv-preview {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .cv-preview * {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .cv-preview h1,
+  [dir="rtl"] .cv-preview h2,
+  [dir="rtl"] .cv-preview h3,
+  [dir="rtl"] .cv-preview h4,
+  [dir="rtl"] .cv-preview h5,
+  [dir="rtl"] .cv-preview h6,
+  [dir="rtl"] .cv-preview p,
+  [dir="rtl"] .cv-preview div,
+  [dir="rtl"] .cv-preview span {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .cv-preview .ltr-content {
+    text-align: left !important;
+    direction: ltr;
+    display: inline-block;
+  }
+
+  /* Force RTL text alignment for all text elements */
+  [dir="rtl"] .text-right,
+  [dir="rtl"] .rtl-text {
+    text-align: right !important;
+  }
+
+  /* Override any conflicting styles in RTL mode */
+  [dir="rtl"] .cv-preview .text-gray-700,
+  [dir="rtl"] .cv-preview .text-gray-600,
+  [dir="rtl"] .cv-preview .text-primary {
+    text-align: right !important;
+  }
+
+  /* Ensure proper text alignment in RTL mode */
+  .rtl-text {
+    text-align: right !important;
+  }
+
+  .ltr-text {
+    text-align: left !important;
+  }
+
+  /* Specific RTL classes */
+  [dir="rtl"] .rtl-text-right {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .rtl-text-left {
+    text-align: left !important;
+  }
+
+  [dir="rtl"] .rtl-ml-auto {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  [dir="rtl"] .rtl-mr-auto {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  [dir="rtl"] .rtl-flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  [dir="rtl"] .rtl-space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  /* Arabic text improvements with Cairo font */
+  [lang="ar"] {
+    font-family: var(--font-cairo), "Arial", sans-serif;
+    font-feature-settings: "liga" 1, "kern" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: right;
+  }
+
+  [lang="ar"] * {
+    text-align: right;
+    font-family: var(--font-cairo), "Arial", sans-serif;
+  }
+
+  [lang="ar"] input,
+  [lang="ar"] textarea {
+    text-align: right;
+    font-family: var(--font-cairo), "Arial", sans-serif;
+  }
+
+  [lang="ar"] .ltr-content {
+    direction: ltr;
+    text-align: left !important;
+    font-family: var(--font-inter), "Arial", sans-serif;
+  }
+
+  /* Enhanced Arabic typography */
+  [lang="ar"] h1,
+  [lang="ar"] h2,
+  [lang="ar"] h3,
+  [lang="ar"] h4,
+  [lang="ar"] h5,
+  [lang="ar"] h6 {
+    font-family: var(--font-cairo), "Arial", sans-serif;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  [lang="ar"] p,
+  [lang="ar"] span,
+  [lang="ar"] div,
+  [lang="ar"] label,
+  [lang="ar"] button {
+    font-family: var(--font-cairo), "Arial", sans-serif;
+    line-height: 1.6;
+    text-align: right;
+  }
+
+  /* Force right alignment for all text elements in RTL */
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] h5,
+  [dir="rtl"] h6,
+  [dir="rtl"] p,
+  [dir="rtl"] span,
+  [dir="rtl"] div,
+  [dir="rtl"] label,
+  [dir="rtl"] button {
+    text-align: right !important;
+  }
+
+  /* Buttons and interactive elements */
+  [dir="rtl"] button {
+    text-align: right;
+  }
+
+  [dir="rtl"] .btn {
+    text-align: right;
+  }
+}
+
+/* Custom input styles to remove gray background on focus */
+@layer components {
+  .input-clean {
+    @apply flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    background-color: white !important;
+  }
+
+  .input-clean:focus {
+    background-color: white !important;
+  }
+
+  .textarea-clean {
+    @apply flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    min-height: 80px;
+    background-color: white !important;
+  }
+
+  .textarea-clean:focus {
+    background-color: white !important;
+  }
+
+  /* RTL-aware components */
+  .rtl-card {
+    @apply transition-all duration-200;
+  }
+
+  [dir="rtl"] .rtl-card {
+    transform: scaleX(-1);
+  }
+
+  [dir="rtl"] .rtl-card > * {
+    transform: scaleX(-1);
+  }
+
+  /* RTL input alignment */
+  [dir="rtl"] .input-clean,
+  [dir="rtl"] .textarea-clean {
+    text-align: right !important;
+  }
+
+  [dir="rtl"] .input-clean::placeholder,
+  [dir="rtl"] .textarea-clean::placeholder {
+    text-align: right !important;
+  }
+}
+
+/* Override any default input/textarea backgrounds */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="month"],
+textarea {
+  background-color: white !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+textarea:focus {
+  background-color: white !important;
+}
+
+/* RTL input alignment */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="date"],
+[dir="rtl"] input[type="month"],
+[dir="rtl"] textarea {
+  text-align: right !important;
+}
+
+/* Ensure disabled inputs have appropriate styling */
+input:disabled,
+textarea:disabled {
+  background-color: #f9fafb !important;
+  opacity: 0.5;
+}
+
+/* Theme color utilities */
+.theme-blue {
+  --theme-primary: var(--theme-blue);
+}
+.theme-green {
+  --theme-primary: var(--theme-green);
+}
+.theme-purple {
+  --theme-primary: var(--theme-purple);
+}
+.theme-red {
+  --theme-primary: var(--theme-red);
+}
+.theme-orange {
+  --theme-primary: var(--theme-orange);
+}
+.theme-pink {
+  --theme-primary: var(--theme-pink);
+}
+.theme-indigo {
+  --theme-primary: var(--theme-indigo);
+}
+.theme-teal {
+  --theme-primary: var(--theme-teal);
+}
+.theme-gray {
+  --theme-primary: var(--theme-gray);
+}
+.theme-black {
+  --theme-primary: var(--theme-black);
+}
+
+/* Smooth theme transitions */
+* {
+  transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+}
+
+/* Cairo font loading optimization */
+@font-face {
+  font-family: "Cairo Fallback";
+  src: local("Arial");
+  font-display: swap;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+/* Hanging indent for bullet points */
+.hanging-indent-bullet {
+  text-indent: -0.5em;
+  padding-left: 0;
+  margin-left: 1em;
+}
+
+.hanging-indent-bullet li {
+  text-indent: -0.5em;
+  padding-left: 0.5em;
+  margin-left: 0;
+}
+
+/* RTL hanging indent */
+[dir="rtl"] .hanging-indent-bullet {
+  text-indent: 0.5em;
+  padding-right: 0;
+  margin-right: 1em;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+[dir="rtl"] .hanging-indent-bullet li {
+  text-indent: 0.5em;
+  padding-right: 0.5em;
+  padding-left: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* Animation keyframes for Magic UI components */
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+@keyframes grid {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
