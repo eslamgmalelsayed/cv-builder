@@ -170,19 +170,19 @@ export function useCVData() {
     (updater: (prev: CVState) => CVState) => {
       setState((prev) => {
         const newState = updater(prev);
-        // Trigger immediate save
-        setTimeout(() => {
+
+        // Save immediately without setTimeout to avoid race conditions
+        try {
           const stateToSave: CVState = {
             ...newState,
             lastSaved: new Date().toISOString(),
           };
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-            setLastSaveTime(new Date());
-          } catch (error) {
-            console.error("Error saving CV data to localStorage:", error);
-          }
-        }, 0);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+          setLastSaveTime(new Date());
+        } catch (error) {
+          console.error("Error saving CV data to localStorage:", error);
+        }
+
         return newState;
       });
     },
@@ -192,10 +192,13 @@ export function useCVData() {
   // Update functions
   const updatePersonalInfo = useCallback(
     (personalInfo: CVData["personalInfo"]) => {
-      updateStateAndSave((prev) => ({
-        ...prev,
-        cvData: { ...prev.cvData, personalInfo },
-      }));
+      updateStateAndSave((prev) => {
+        const newState = {
+          ...prev,
+          cvData: { ...prev.cvData, personalInfo },
+        };
+        return newState;
+      });
     },
     [updateStateAndSave]
   );

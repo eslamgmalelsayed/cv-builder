@@ -75,6 +75,9 @@ export function AIInput({
     setCursorPosition(e.target.selectionStart || 0);
     onValueChange?.(newValue);
 
+    // Call the original onChange prop if it exists
+    props.onChange?.(e);
+
     // Get AI suggestion if there's meaningful content
     if (newValue.trim().length >= 3) {
       getSuggestion(newValue, field, context);
@@ -84,6 +87,16 @@ export function AIInput({
   const handleAcceptSuggestion = () => {
     setValue(suggestion);
     onValueChange?.(suggestion);
+
+    // Call onChange with synthetic event
+    if (props.onChange) {
+      const syntheticEvent = {
+        target: { value: suggestion },
+        currentTarget: { value: suggestion },
+      } as React.ChangeEvent<HTMLInputElement>;
+      props.onChange(syntheticEvent);
+    }
+
     acceptSuggestion();
 
     // Focus back to input
@@ -212,6 +225,9 @@ export function AITextarea({
     setValue(newValue);
     onValueChange?.(newValue);
 
+    // Call the original onChange prop if it exists
+    props.onChange?.(e);
+
     // Get AI suggestion for longer content
     if (newValue.trim().length >= 5) {
       // Get the current line or last sentence for context-aware suggestions
@@ -228,6 +244,16 @@ export function AITextarea({
     const newValue = value + (value.endsWith(" ") ? "" : " ") + suggestion;
     setValue(newValue);
     onValueChange?.(newValue);
+
+    // Call onChange with synthetic event
+    if (props.onChange) {
+      const syntheticEvent = {
+        target: { value: newValue },
+        currentTarget: { value: newValue },
+      } as React.ChangeEvent<HTMLTextAreaElement>;
+      props.onChange(syntheticEvent);
+    }
+
     acceptSuggestion();
 
     // Focus back to textarea

@@ -323,40 +323,6 @@ export function CVBuilder() {
                             language={language}
                             cvData={cvData}
                           />
-
-                          {/* Debug: Show current data and fix button */}
-                          {process.env.NODE_ENV === "development" && (
-                            <div className="mt-4 p-3 bg-gray-100 rounded text-xs">
-                              <p>
-                                <strong>Debug Info:</strong>
-                              </p>
-                              <p>Title: "{cvData.personalInfo.title}"</p>
-                              <p>
-                                Has title field:{" "}
-                                {cvData.personalInfo.hasOwnProperty("title")
-                                  ? "Yes"
-                                  : "No"}
-                              </p>
-                              {!cvData.personalInfo.title && (
-                                <button
-                                  onClick={() => {
-                                    const newPersonalInfo = {
-                                      ...cvData.personalInfo,
-                                    };
-                                    if (
-                                      !newPersonalInfo.hasOwnProperty("title")
-                                    ) {
-                                      newPersonalInfo.title = "";
-                                    }
-                                    updatePersonalInfo(newPersonalInfo);
-                                  }}
-                                  className="mt-2 px-2 py-1 bg-blue-500 text-white rounded text-xs"
-                                >
-                                  Refresh Title Field
-                                </button>
-                              )}
-                            </div>
-                          )}
                         </TabsContent>
 
                         <TabsContent value="experience" className="mt-6">

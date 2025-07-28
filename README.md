@@ -15,6 +15,8 @@
 
 CV Builder is a modern, free web application that helps you create professional, ATS-compliant resumes with AI-powered suggestions. Built with Next.js 14, TypeScript, and integrated with Groq AI for intelligent resume optimization.
 
+## 🎯 Demo https://cvifi.netlify.app/
+
 ### ✨ Key Highlights
 
 - **100% Free Forever** - No hidden costs or premium tiers
