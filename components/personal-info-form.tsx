@@ -77,10 +77,10 @@ export function PersonalInfoForm({
   const isRTL = language === "ar";
 
   return (
-    <div className={`space-y-4 ${isRTL ? "text-right" : ""}`}>
+    <div className={`space-y-4 ${isRTL ? "text-start" : ""}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="fullName" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="fullName" className={isRTL ? "text-start block" : ""}>
             {t.fullName}
           </Label>
           <AIInput
@@ -88,15 +88,12 @@ export function PersonalInfoForm({
             value={data.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
             placeholder={t.fullNamePlaceholder}
-            className={`input-clean ${isRTL ? "text-right" : ""}`}
+            className={`input-clean ${isRTL ? "text-start" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
-            field="personal-name"
-            context={cvData}
-            language={language}
           />
         </div>
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="title" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="title" className={isRTL ? "text-start block" : ""}>
             {t.title}
           </Label>
           <AIInput
@@ -104,18 +101,15 @@ export function PersonalInfoForm({
             value={data.title || ""}
             onChange={(e) => handleChange("title", e.target.value)}
             placeholder={t.titlePlaceholder}
-            className={`input-clean ${isRTL ? "text-right" : ""}`}
+            className={`input-clean ${isRTL ? "text-start" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
-            field="personal-title"
-            context={cvData}
-            language={language}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="email" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="email" className={isRTL ? "text-start block" : ""}>
             {t.email}
           </Label>
           <Input
@@ -131,8 +125,8 @@ export function PersonalInfoForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="phone" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="phone" className={isRTL ? "text-start block" : ""}>
             {t.phone}
           </Label>
           <Input
@@ -144,8 +138,8 @@ export function PersonalInfoForm({
             style={{ textAlign: "left" }}
           />
         </div>
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="location" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="location" className={isRTL ? "text-start block" : ""}>
             {t.location}
           </Label>
           <Input
@@ -153,15 +147,15 @@ export function PersonalInfoForm({
             value={data.location}
             onChange={(e) => handleChange("location", e.target.value)}
             placeholder={t.locationPlaceholder}
-            className={`input-clean ${isRTL ? "text-right" : ""}`}
+            className={`input-clean ${isRTL ? "text-start" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="linkedIn" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="linkedIn" className={isRTL ? "text-start block" : ""}>
             {t.linkedIn}
           </Label>
           <Input
@@ -173,8 +167,8 @@ export function PersonalInfoForm({
             style={{ textAlign: "left" }}
           />
         </div>
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="website" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="website" className={isRTL ? "text-start block" : ""}>
             {t.website}
           </Label>
           <Input
@@ -189,8 +183,8 @@ export function PersonalInfoForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-        <div className={isRTL ? "text-right" : ""}>
-          <Label htmlFor="github" className={isRTL ? "text-right block" : ""}>
+        <div className={isRTL ? "text-start" : ""}>
+          <Label htmlFor="github" className={isRTL ? "text-start block" : ""}>
             {t.github}
           </Label>
           <Input
@@ -204,8 +198,8 @@ export function PersonalInfoForm({
         </div>
       </div>
 
-      <div className={isRTL ? "text-right" : ""}>
-        <Label htmlFor="summary" className={isRTL ? "text-right block" : ""}>
+      <div className={isRTL ? "text-start" : ""}>
+        <Label htmlFor="summary" className={isRTL ? "text-start block" : ""}>
           {t.summary}
         </Label>
         <AITextarea
@@ -214,14 +208,14 @@ export function PersonalInfoForm({
           onChange={(e) => handleChange("summary", e.target.value)}
           placeholder={t.summaryPlaceholder}
           rows={4}
-          className={`textarea-clean ${isRTL ? "text-right" : ""}`}
+          className={`textarea-clean ${isRTL ? "text-start" : ""}`}
           style={isRTL ? { textAlign: "right" } : {}}
           field="professional-summary"
           context={cvData}
           language={language}
         />
         <p
-          className={`text-sm text-gray-500 mt-1 ${isRTL ? "text-right" : ""}`}
+          className={`text-sm text-gray-500 mt-1 ${isRTL ? "text-start" : ""}`}
         >
           {t.summaryTip}
         </p>

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ArrowRight, Sparkles, Zap, FileText, Brain } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -226,10 +225,6 @@ export default function Home() {
                 </ShimmerButton>
               </Link>
             </div>
-
-            <p className="text-sm text-muted-foreground mt-4">
-              {content.home.cta.disclaimer}
-            </p>
           </div>
         </div>
       </section>

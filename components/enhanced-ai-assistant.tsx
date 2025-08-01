@@ -488,25 +488,29 @@ export function EnhancedAIAssistant({
             ) : (
               <div className="space-y-4">
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex flex-col xs:flex-row gap-2 w-full">
                   <Button
                     onClick={applyAllSuggestions}
                     disabled={appliedCount === totalCount}
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 min-w-0 px-2 sm:px-4 py-2"
                   >
-                    <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="text-xs sm:text-sm">{t.applyAll}</span>
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">
+                      {t.applyAll}
+                    </span>
                   </Button>
                   <Button
                     onClick={revertAllSuggestions}
                     disabled={appliedCount === 0}
                     variant="outline"
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 min-w-0 px-2 sm:px-4 py-2"
                   >
-                    <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="text-xs sm:text-sm">{t.revertAll}</span>
+                    <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm truncate">
+                      {t.revertAll}
+                    </span>
                   </Button>
                 </div>
 

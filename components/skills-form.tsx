@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +68,106 @@ const skillTypeNames = {
   },
 };
 
+// Memoized skill input component to prevent re-renders
+const SkillInput = memo(
+  ({
+    value,
+    onChange,
+    onBlur,
+    onKeyDown,
+    placeholder,
+  }: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    placeholder: string;
+  }) => (
+    <Input
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      placeholder={placeholder}
+      className="input-clean"
+    />
+  )
+);
+
+SkillInput.displayName = "SkillInput";
+
+// Individual memoized skill section components
+const SkillSectionComponent = memo(
+  ({
+    title,
+    skills,
+    newSkill,
+    placeholder,
+    onInputChange,
+    onKeyPress,
+    onAddSkill,
+    onRemoveSkill,
+    onBlur,
+    noSkillsMessage,
+  }: {
+    title: string;
+    skills: string[];
+    newSkill: string;
+    placeholder: string;
+    onInputChange: (value: string) => void;
+    onKeyPress: (e: React.KeyboardEvent) => void;
+    onAddSkill: () => void;
+    onRemoveSkill: (index: number) => void;
+    onBlur: () => void;
+    noSkillsMessage: string;
+  }) => (
+    <Card className="h-fit">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex gap-2">
+          <SkillInput
+            value={newSkill}
+            onChange={(e) => onInputChange(e.target.value)}
+            onBlur={onBlur}
+            onKeyDown={onKeyPress}
+            placeholder={placeholder}
+          />
+          <Button onClick={onAddSkill} size="sm">
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {skills.map((skill, index) => (
+            <Badge
+              key={`${skill}-${index}`}
+              variant="secondary"
+              className="flex items-center gap-1"
+            >
+              {skill}
+              <button
+                onClick={() => onRemoveSkill(index)}
+                className="ms-1 hover:text-red-500"
+                type="button"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+
+        {skills.length === 0 && (
+          <p className="text-sm text-gray-500">{noSkillsMessage}</p>
+        )}
+      </CardContent>
+    </Card>
+  )
+);
+
+SkillSectionComponent.displayName = "SkillSectionComponent";
+
 export function SkillsForm({
   data,
   onChange,
@@ -82,17 +182,20 @@ export function SkillsForm({
   });
 
   // Ensure skills data is properly formatted as arrays
-  const safeData = {
-    technical: Array.isArray(data?.technical) ? data.technical : [],
-    soft: Array.isArray(data?.soft) ? data.soft : [],
-    languages: Array.isArray(data?.languages) ? data.languages : [],
-    certifications: Array.isArray(data?.certifications)
-      ? data.certifications
-      : [],
-  };
+  const safeData = useMemo(
+    () => ({
+      technical: Array.isArray(data?.technical) ? data.technical : [],
+      soft: Array.isArray(data?.soft) ? data.soft : [],
+      languages: Array.isArray(data?.languages) ? data.languages : [],
+      certifications: Array.isArray(data?.certifications)
+        ? data.certifications
+        : [],
+    }),
+    [data]
+  );
 
-  const t = translations[language];
-  const skillNames = skillTypeNames[language];
+  const t = useMemo(() => translations[language], [language]);
+  const skillNames = useMemo(() => skillTypeNames[language], [language]);
 
   const addSkill = useCallback(
     (category: keyof CVData["skills"], skill: string) => {
@@ -134,63 +237,85 @@ export function SkillsForm({
     []
   );
 
-  const SkillSection = ({
-    title,
-    category,
-    placeholder,
-  }: {
-    title: string;
-    category: keyof CVData["skills"];
-    placeholder: string;
-  }) => (
-    <Card className="h-fit">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex gap-2">
-          <Input
-            value={newSkill[category]}
-            onChange={(e) => handleInputChange(category, e.target.value)}
-            onBlur={saveOnBlur}
-            onKeyDown={(e) => handleKeyPress(e, category)}
-            placeholder={placeholder}
-            className="input-clean"
-          />
-          <Button
-            onClick={() => addSkill(category, newSkill[category])}
-            size="sm"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+  // Individual handlers for each skill category
+  const handleTechnicalInputChange = useCallback(
+    (value: string) => handleInputChange("technical", value),
+    [handleInputChange]
+  );
 
-        <div className="flex flex-wrap gap-2">
-          {safeData[category].map((skill, index) => (
-            <Badge
-              key={`${skill}-${index}`}
-              variant="secondary"
-              className="flex items-center gap-1"
-            >
-              {skill}
-              <button
-                onClick={() => removeSkill(category, index)}
-                className="ml-1 hover:text-red-500"
-                type="button"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
+  const handleSoftInputChange = useCallback(
+    (value: string) => handleInputChange("soft", value),
+    [handleInputChange]
+  );
 
-        {safeData[category].length === 0 && (
-          <p className="text-sm text-gray-500">
-            {t.noSkillsAdded.replace("{type}", skillNames[category])}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+  const handleLanguagesInputChange = useCallback(
+    (value: string) => handleInputChange("languages", value),
+    [handleInputChange]
+  );
+
+  const handleCertificationsInputChange = useCallback(
+    (value: string) => handleInputChange("certifications", value),
+    [handleInputChange]
+  );
+
+  const handleTechnicalKeyPress = useCallback(
+    (e: React.KeyboardEvent) => handleKeyPress(e, "technical"),
+    [handleKeyPress]
+  );
+
+  const handleSoftKeyPress = useCallback(
+    (e: React.KeyboardEvent) => handleKeyPress(e, "soft"),
+    [handleKeyPress]
+  );
+
+  const handleLanguagesKeyPress = useCallback(
+    (e: React.KeyboardEvent) => handleKeyPress(e, "languages"),
+    [handleKeyPress]
+  );
+
+  const handleCertificationsKeyPress = useCallback(
+    (e: React.KeyboardEvent) => handleKeyPress(e, "certifications"),
+    [handleKeyPress]
+  );
+
+  const handleTechnicalAdd = useCallback(
+    () => addSkill("technical", newSkill.technical),
+    [addSkill, newSkill.technical]
+  );
+
+  const handleSoftAdd = useCallback(
+    () => addSkill("soft", newSkill.soft),
+    [addSkill, newSkill.soft]
+  );
+
+  const handleLanguagesAdd = useCallback(
+    () => addSkill("languages", newSkill.languages),
+    [addSkill, newSkill.languages]
+  );
+
+  const handleCertificationsAdd = useCallback(
+    () => addSkill("certifications", newSkill.certifications),
+    [addSkill, newSkill.certifications]
+  );
+
+  const handleTechnicalRemove = useCallback(
+    (index: number) => removeSkill("technical", index),
+    [removeSkill]
+  );
+
+  const handleSoftRemove = useCallback(
+    (index: number) => removeSkill("soft", index),
+    [removeSkill]
+  );
+
+  const handleLanguagesRemove = useCallback(
+    (index: number) => removeSkill("languages", index),
+    [removeSkill]
+  );
+
+  const handleCertificationsRemove = useCallback(
+    (index: number) => removeSkill("certifications", index),
+    [removeSkill]
   );
 
   return (
@@ -198,28 +323,65 @@ export function SkillsForm({
       <h3 className="text-lg font-semibold">{t.skillsQualifications}</h3>
 
       <div className="space-y-4">
-        <SkillSection
+        <SkillSectionComponent
           title={t.technicalSkills}
-          category="technical"
+          skills={safeData.technical}
+          newSkill={newSkill.technical}
           placeholder={t.technicalPlaceholder}
+          onInputChange={handleTechnicalInputChange}
+          onKeyPress={handleTechnicalKeyPress}
+          onAddSkill={handleTechnicalAdd}
+          onRemoveSkill={handleTechnicalRemove}
+          onBlur={saveOnBlur}
+          noSkillsMessage={t.noSkillsAdded.replace(
+            "{type}",
+            skillNames.technical
+          )}
         />
 
-        <SkillSection
+        <SkillSectionComponent
           title={t.softSkills}
-          category="soft"
+          skills={safeData.soft}
+          newSkill={newSkill.soft}
           placeholder={t.softPlaceholder}
+          onInputChange={handleSoftInputChange}
+          onKeyPress={handleSoftKeyPress}
+          onAddSkill={handleSoftAdd}
+          onRemoveSkill={handleSoftRemove}
+          onBlur={saveOnBlur}
+          noSkillsMessage={t.noSkillsAdded.replace("{type}", skillNames.soft)}
         />
 
-        <SkillSection
+        <SkillSectionComponent
           title={t.languages}
-          category="languages"
+          skills={safeData.languages}
+          newSkill={newSkill.languages}
           placeholder={t.languagesPlaceholder}
+          onInputChange={handleLanguagesInputChange}
+          onKeyPress={handleLanguagesKeyPress}
+          onAddSkill={handleLanguagesAdd}
+          onRemoveSkill={handleLanguagesRemove}
+          onBlur={saveOnBlur}
+          noSkillsMessage={t.noSkillsAdded.replace(
+            "{type}",
+            skillNames.languages
+          )}
         />
 
-        <SkillSection
+        <SkillSectionComponent
           title={t.certifications}
-          category="certifications"
+          skills={safeData.certifications}
+          newSkill={newSkill.certifications}
           placeholder={t.certificationsPlaceholder}
+          onInputChange={handleCertificationsInputChange}
+          onKeyPress={handleCertificationsKeyPress}
+          onAddSkill={handleCertificationsAdd}
+          onRemoveSkill={handleCertificationsRemove}
+          onBlur={saveOnBlur}
+          noSkillsMessage={t.noSkillsAdded.replace(
+            "{type}",
+            skillNames.certifications
+          )}
         />
       </div>
 

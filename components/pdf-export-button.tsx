@@ -5,13 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { useAlertModal } from "@/components/ui/alert-modal";
 
+// Translations for PDF export button
+const translations = {
+  en: {
+    downloadPdf: "Download PDF",
+    generatingPdf: "Generating PDF...",
+  },
+  ar: {
+    downloadPdf: "تحميل PDF",
+    generatingPdf: "جاري إنشاء PDF...",
+  },
+};
+
 interface PDFExportButtonProps {
   cvData: any;
+  language?: "en" | "ar";
 }
 
-export function PDFExportButton({ cvData }: PDFExportButtonProps) {
+export function PDFExportButton({
+  cvData,
+  language = "en",
+}: PDFExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { showAlert } = useAlertModal();
+  const t = translations[language];
 
   const generatePDF = async () => {
     try {
@@ -186,17 +203,17 @@ export function PDFExportButton({ cvData }: PDFExportButtonProps) {
       onClick={generatePDF}
       disabled={isGenerating}
       variant="outline"
-      className="w-full sm:w-auto bg-white hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 border-gray-300"
+      className="w-full sm:w-auto bg-white hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 border-gray-300 flex items-center gap-2"
     >
       {isGenerating ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generating PDF...
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {t.generatingPdf}
         </>
       ) : (
         <>
-          <Download className="mr-2 h-4 w-4" />
-          Download PDF
+          <Download className="h-4 w-4" />
+          {t.downloadPdf}
         </>
       )}
     </Button>

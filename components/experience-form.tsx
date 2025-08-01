@@ -242,9 +242,6 @@ export function ExperienceForm({
                   onBlur={saveOnBlur}
                   placeholder={t.jobTitlePlaceholder}
                   className="input-clean"
-                  field="job-title"
-                  context={{ ...cvData, currentExperience: exp }}
-                  language={language}
                 />
               </div>
               <div>

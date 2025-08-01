@@ -261,7 +261,7 @@ export function CVPreview({
                     </h2>
                     {!isPreviewMode &&
                       (onEditCustomSection || onDeleteCustomSection) && (
-                        <div className="flex gap-2 ml-4">
+                        <div className="flex gap-2 ms-4">
                           {onEditCustomSection && (
                             <Button
                               variant="ghost"

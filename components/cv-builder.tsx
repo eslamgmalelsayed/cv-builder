@@ -262,7 +262,7 @@ export function CVBuilder() {
   return (
     <div
       className={`container mx-auto p-4 max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px] ${
-        direction === "rtl" ? "text-right" : ""
+        direction === "rtl" ? "text-start" : ""
       }`}
     >
       <div className="mb-6">
@@ -271,7 +271,7 @@ export function CVBuilder() {
             direction === "rtl" ? "sm:flex-row-reverse" : ""
           }`}
         >
-          <div className={`${direction === "rtl" ? "text-right" : ""} flex-1`}>
+          <div className={`${direction === "rtl" ? "text-start" : ""} flex-1`}>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {t.title}
             </h1>
@@ -317,7 +317,7 @@ export function CVBuilder() {
           {t.atsScore}
         </Button>
         <div className="w-full sm:w-auto">
-          <PDFExportButton cvData={cvData} />
+          <PDFExportButton cvData={cvData} language={language} />
         </div>
       </div>
 
@@ -333,7 +333,7 @@ export function CVBuilder() {
         <div className="flex flex-col h-fit">
           <Card className="h-fit">
             <CardHeader>
-              <CardTitle className={direction === "rtl" ? "text-right" : ""}>
+              <CardTitle className={direction === "rtl" ? "text-start" : ""}>
                 {t.buildCV}
               </CardTitle>
             </CardHeader>
