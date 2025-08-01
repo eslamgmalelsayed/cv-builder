@@ -106,6 +106,21 @@ export function useCVData() {
             skills: {
               ...defaultState.cvData.skills,
               ...parsedState.cvData.skills,
+              // Ensure all skill arrays are properly initialized
+              technical: Array.isArray(parsedState.cvData.skills?.technical)
+                ? parsedState.cvData.skills.technical
+                : defaultState.cvData.skills.technical,
+              soft: Array.isArray(parsedState.cvData.skills?.soft)
+                ? parsedState.cvData.skills.soft
+                : defaultState.cvData.skills.soft,
+              languages: Array.isArray(parsedState.cvData.skills?.languages)
+                ? parsedState.cvData.skills.languages
+                : defaultState.cvData.skills.languages,
+              certifications: Array.isArray(
+                parsedState.cvData.skills?.certifications
+              )
+                ? parsedState.cvData.skills.certifications
+                : defaultState.cvData.skills.certifications,
             },
           },
           visibleSections: {

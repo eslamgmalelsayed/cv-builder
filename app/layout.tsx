@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Cairo } from "next/font/google";
+import { LanguageProvider, SharedHeader } from "@/components/shared-header";
+import { BodyWrapper } from "@/components/body-wrapper";
 import "./globals.css";
 import "../styles/rtl.css";
 
@@ -199,8 +201,16 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${cairo.variable} font-inter`}>
-        {children}
+      <body className={`${inter.className} ${cairo.variable}`}>
+        <LanguageProvider>
+          <BodyWrapper
+            interClassName={inter.className}
+            cairoVariable={cairo.variable}
+          >
+            <SharedHeader />
+            {children}
+          </BodyWrapper>
+        </LanguageProvider>
       </body>
     </html>
   );

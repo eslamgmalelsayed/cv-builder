@@ -1,238 +1,391 @@
-export interface HomePageContent {
-  hero: {
-    badge: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    primaryButton: string;
-    secondaryButton: string;
-    trustIndicator: string;
+// Comprehensive translation interface for the entire application
+export interface AppTranslations {
+  common: {
+    loading: string;
+    search: string;
+    location: string;
+    comingSoon: string;
+    featured: string;
   };
-  features: {
-    title: string;
-    subtitle: string;
-    items: Array<{
-      title: string;
-      description: string;
-    }>;
-    badges: {
-      free: string;
-      atsCompliant: string;
-      aiPowered: string;
-      instantPdf: string;
-    };
+  header: {
+    buildCV: string;
+    jobs: string;
   };
-  benefits: {
-    title: string;
-    subtitle: string;
-    items: Array<{
-      title: string;
-      description: string;
-    }>;
-  };
-  cta: {
-    title: string;
-    description: string;
-    button: string;
-    disclaimer: string;
+  languages: {
+    english: string;
+    arabic: string;
   };
   footer: {
-    description: string;
     copyright: string;
+    description: string;
+  };
+  home: {
+    hero: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      description: string;
+      primaryButton: string;
+      secondaryButton: string;
+      trustIndicator: string;
+    };
+    features: {
+      title: string;
+      subtitle: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+      badges: {
+        free: string;
+        atsCompliant: string;
+        aiPowered: string;
+        instantPdf: string;
+      };
+    };
+    benefits: {
+      title: string;
+      subtitle: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+    };
+    cta: {
+      title: string;
+      description: string;
+      button: string;
+      disclaimer: string;
+    };
+    footer: {
+      description: string;
+      copyright: string;
+    };
+  };
+  jobs: {
+    header: {
+      title: string;
+      description: string;
+    };
+    hero: {
+      comingSoonBadge: string;
+      title: string;
+      subtitle: string;
+      description: string;
+      searchPlaceholder: {
+        jobTitle: string;
+        location: string;
+        searchButton: string;
+      };
+      featureComingSoon: string;
+    };
+    features: {
+      aiSearch: {
+        title: string;
+        description: string;
+      };
+      topCompanies: {
+        title: string;
+        description: string;
+      };
+      jobAlerts: {
+        title: string;
+        description: string;
+      };
+    };
+    cta: {
+      title: string;
+      description: string;
+      button: string;
+    };
+    preview: {
+      title: string;
+      description: string;
+      featured: string;
+    };
   };
 }
 
-export const homePageContent: Record<string, HomePageContent> = {
-  en: {
-    hero: {
-      badge: "AI-Powered Resume Builder",
-      title: "Build Your Perfect",
-      subtitle: "Professional CV",
-      description:
-        "Create ATS-compliant resumes that get you hired. Our AI-powered builder helps you craft the perfect CV with professional templates, smart suggestions, and instant PDF export.",
-      primaryButton: "Start Building Your CV",
-      secondaryButton: "Get Started for Free",
-      trustIndicator:
-        "Join thousands of job seekers who have successfully landed interviews",
-    },
-    features: {
-      title: "Everything You Need",
-      subtitle:
-        "Build professional resumes with powerful features designed to help you land your dream job",
-      badges: {
-        free: "100% Free",
-        atsCompliant: "ATS-Compliant",
-        aiPowered: "AI-Powered",
-        instantPdf: "Instant PDF",
+// Helper function to get translations for current language
+export function getTranslations(language: string): AppTranslations {
+  const translations: Record<string, AppTranslations> = {
+    ar: {
+      common: {
+        loading: "جاري التحميل...",
+        search: "بحث",
+        location: "الموقع",
+        comingSoon: "قريباً",
+        featured: "مميزة",
       },
-      items: [
-        {
-          title: "ATS-Compliant Templates",
-          description:
-            "Professional templates designed to pass Applicant Tracking Systems and impress recruiters.",
-        },
-        {
-          title: "AI-Powered Suggestions",
-          description:
-            "Get intelligent content recommendations and optimization tips to make your CV stand out.",
-        },
-        {
-          title: "Real-time Preview",
-          description:
-            "See exactly how your CV will look as you build it, with instant updates and professional formatting.",
-        },
-        {
-          title: "One-Click PDF Export",
-          description:
-            "Download your polished CV as a high-quality PDF ready for job applications.",
-        },
-        {
-          title: "Drag & Drop Sections",
-          description:
-            "Easily reorder and customize sections to highlight your strengths and experience.",
-        },
-        {
-          title: "Multiple Themes",
-          description:
-            "Choose from various color themes to match your personal style and industry standards.",
-        },
-      ],
-    },
-    benefits: {
-      title: "Why Choose Our CV Builder?",
-      subtitle:
-        "Join thousands of professionals who have successfully landed their dream jobs",
-      items: [
-        {
-          title: "100% Free",
-          description:
-            "No hidden fees, no premium upsells. Build and download your professional CV completely free.",
-        },
-        {
-          title: "ATS-Optimized",
-          description:
-            "All templates are designed to pass Applicant Tracking Systems used by 99% of companies.",
-        },
-        {
-          title: "Professional Quality",
-          description:
-            "Industry-standard formatting and design that impresses hiring managers and recruiters.",
-        },
-        {
-          title: "Fast & Easy",
-          description:
-            "Build your complete CV in under 10 minutes with our intuitive drag-and-drop interface.",
-        },
-      ],
-    },
-    cta: {
-      title: "Ready to Land Your Dream Job?",
-      description:
-        "Join thousands of professionals who have successfully built their careers with our CV builder.",
-      button: "Create Your CV Now",
-      disclaimer:
-        "No registration required • Free forever • Professional results",
-    },
-    footer: {
-      description:
-        "Build professional, ATS-compliant resumes that get results. Start your career journey today.",
-      copyright: "© 2025 CVIFI. Built with ❤️ for job seekers worldwide.",
-    },
-  },
-  ar: {
-    hero: {
-      badge: "منشئ السيرة الذاتية بالذكاء الاصطناعي",
-      title: "اصنع سيرتك الذاتية",
-      subtitle: "المثالية والمهنية",
-      description:
-        "أنشئ سيرة ذاتية متوافقة مع أنظمة التتبع تضمن حصولك على الوظيفة. منشئنا المدعوم بالذكاء الاصطناعي يساعدك في إنشاء السيرة الذاتية المثالية بقوالب مهنية واقتراحات ذكية وتصدير فوري بصيغة PDF.",
-      primaryButton: "ابدأ إنشاء سيرتك الذاتية",
-      secondaryButton: "ابدأ مجاناً",
-      trustIndicator:
-        "انضم إلى آلاف الباحثين عن العمل الذين نجحوا في الحصول على مقابلات",
-    },
-    features: {
-      title: "كل ما تحتاجه",
-      subtitle:
-        "اصنع سيرة ذاتية مهنية بميزات قوية مصممة لمساعدتك في الحصول على وظيفة أحلامك",
-      badges: {
-        free: "مجاني 100%",
-        atsCompliant: "متوافق مع أنظمة التتبع",
-        aiPowered: "مدعوم بالذكاء الاصطناعي",
-        instantPdf: "PDF فوري",
+      header: {
+        buildCV: "بناء السيرة الذاتية",
+        jobs: "الوظائف",
       },
-      items: [
-        {
-          title: "قوالب متوافقة مع أنظمة التتبع",
+      languages: {
+        english: "English",
+        arabic: "العربية",
+      },
+      footer: {
+        copyright:
+          "© 2025 CVIFI. صُنع بـ ❤️ للباحثين عن العمل في جميع أنحاء العالم.",
+        description:
+          "منشئ السيرة الذاتية المدعوم بالذكاء الاصطناعي الذي يساعدك في الحصول على وظيفة أحلامك.",
+      },
+      home: {
+        hero: {
+          badge: "الآن مع الذكاء الاصطناعي",
+          title: "أنشئ سيرتك الذاتية",
+          subtitle: "في دقائق، وليس ساعات",
           description:
-            "قوالب مهنية مصممة لاجتياز أنظمة تتبع المتقدمين وإعجاب المختصين في التوظيف.",
+            "منشئ السيرة الذاتية المدعوم بالذكاء الاصطناعي الذي يساعدك في إنشاء سيرة ذاتية احترافية تجذب أرباب العمل.",
+          primaryButton: "ابدأ مجاناً",
+          secondaryButton: "شاهد المعاينة",
+          trustIndicator: "موثوق من قبل أكثر من 10,000 باحث عن عمل",
         },
-        {
-          title: "اقتراحات مدعومة بالذكاء الاصطناعي",
+        features: {
+          title: "إنشاء سيرة ذاتية احترافية",
+          subtitle: "تبرز من بين الآخرين",
+          items: [
+            {
+              title: "تحسين لأنظمة التتبع",
+              description: "تأكد من رؤية سيرتك الذاتية من قبل أرباب العمل",
+            },
+            {
+              title: "اقتراحات بالذكاء الاصطناعي",
+              description: "احصل على نصائح وتحسينات ذكية لمحتواك",
+            },
+            {
+              title: "تصدير فوري للPDF",
+              description: "حمل سيرتك الذاتية بتنسيق احترافي",
+            },
+          ],
+          badges: {
+            free: "مجاني",
+            atsCompliant: "متوافق مع أنظمة التتبع",
+            aiPowered: "مدعوم بالذكاء الاصطناعي",
+            instantPdf: "PDF فوري",
+          },
+        },
+        benefits: {
+          title: "لماذا تختار منشئ السيرة الذاتية الخاص بنا؟",
+          subtitle: "نحن نجعل عملية إنشاء السيرة الذاتية سهلة ومؤثرة",
+          items: [
+            {
+              title: "واجهة سهلة الاستخدام",
+              description:
+                "واجهة بسيطة وبديهية تجعل إنشاء السيرة الذاتية أمراً ممتعاً",
+            },
+            {
+              title: "قوالب احترافية",
+              description:
+                "قوالب مصممة من قبل خبراء التوظيف لضمان التأثير الأقصى",
+            },
+            {
+              title: "معاينة في الوقت الفعلي",
+              description: "شاهد تغييراتك فوراً أثناء الكتابة",
+            },
+          ],
+        },
+        cta: {
+          title: "جاهز لإنشاء سيرتك الذاتية المثالية؟",
           description:
-            "احصل على توصيات محتوى ذكية ونصائح تحسين لتجعل سيرتك الذاتية مميزة.",
+            "انضم لآلاف المهنيين الناجحين الذين استخدموا منصتنا للحصول على وظائف أحلامهم.",
+          button: "ابدأ الآن مجاناً",
+          disclaimer: "مجاني للاستخدام. لا حاجة لبطاقة ائتمانية.",
         },
-        {
-          title: "معاينة فورية",
+        footer: {
           description:
-            "شاهد بالضبط كيف ستبدو سيرتك الذاتية أثناء إنشائها، مع تحديثات فورية وتنسيق مهني.",
+            "منشئ السيرة الذاتية المدعوم بالذكاء الاصطناعي الذي يساعدك في الحصول على وظيفة أحلامك.",
+          copyright: "© 2024 منشئ السيرة الذاتية. جميع الحقوق محفوظة.",
         },
-        {
-          title: "تصدير PDF بنقرة واحدة",
+      },
+      jobs: {
+        header: {
+          title: "البحث عن الوظائف",
           description:
-            "حمّل سيرتك الذاتية المصقولة كملف PDF عالي الجودة جاهز لطلبات العمل.",
+            "اعثر على وظيفة أحلامك باستخدام منصة البحث المدعومة بالذكاء الاصطناعي",
         },
-        {
-          title: "أقسام قابلة للسحب والإفلات",
+        hero: {
+          comingSoonBadge: "قريباً",
+          title: "باحث الوظائف",
+          subtitle: "مدعوم بالذكاء الاصطناعي",
           description:
-            "أعد ترتيب الأقسام وخصصها بسهولة لإبراز نقاط قوتك وخبرتك.",
+            "منصة البحث عن الوظائف التالية التي تربطك بأفضل الشركات باستخدام الذكاء الاصطناعي المتقدم",
+          searchPlaceholder: {
+            jobTitle: "المسمى الوظيفي، الكلمات المفتاحية...",
+            location: "الموقع، المدينة...",
+            searchButton: "بحث عن الوظائف",
+          },
+          featureComingSoon: "ميزة قريباً",
         },
-        {
-          title: "سمات متعددة",
-          description:
-            "اختر من بين سمات ألوان مختلفة لتتناسب مع أسلوبك الشخصي ومعايير الصناعة.",
+        features: {
+          aiSearch: {
+            title: "بحث مدعوم بالذكاء الاصطناعي",
+            description: "خوارزميات ذكية تطابق مهاراتك مع أفضل الفرص الوظيفية",
+          },
+          topCompanies: {
+            title: "أفضل الشركات",
+            description:
+              "وصول حصري للوظائف في الشركات الرائدة والناشئة المبتكرة",
+          },
+          jobAlerts: {
+            title: "تنبيهات الوظائف الذكية",
+            description:
+              "احصل على إشعارات فورية عندما تكون هناك وظائف مثالية متاحة",
+          },
         },
-      ],
+        cta: {
+          title: "جاهز للعثور على وظيفة أحلامك؟",
+          description: "انضم لآلاف المهنيين الذين وجدوا وظائفهم المثالية معنا",
+          button: "ابدأ البحث عن الوظائف",
+        },
+        preview: {
+          title: "معاينة الوظائف",
+          description: "استكشف عينة من أفضل الفرص الوظيفية المتاحة قريباً",
+          featured: "مميزة",
+        },
+      },
     },
-    benefits: {
-      title: "لماذا تختار منشئ السيرة الذاتية الخاص بنا؟",
-      subtitle:
-        "انضم إلى آلاف المهنيين الذين نجحوا في الحصول على وظائف أحلامهم",
-      items: [
-        {
-          title: "مجاني 100%",
+    en: {
+      common: {
+        loading: "Loading...",
+        search: "Search",
+        location: "Location",
+        comingSoon: "Coming Soon",
+        featured: "Featured",
+      },
+      header: {
+        buildCV: "Build CV",
+        jobs: "Jobs",
+      },
+      languages: {
+        english: "English",
+        arabic: "العربية",
+      },
+      footer: {
+        copyright: "© 2025 CVIFI. Built with ❤️ for job seekers worldwide.",
+        description:
+          "The AI-powered CV builder that helps you land your dream job.",
+      },
+      home: {
+        hero: {
+          badge: "Now with AI",
+          title: "Create Your CV",
+          subtitle: "In minutes, not hours",
           description:
-            "لا توجد رسوم خفية، لا توجد ترقيات مدفوعة. اصنع وحمّل سيرتك الذاتية المهنية مجاناً تماماً.",
+            "The AI-powered CV builder that helps you create a professional resume that gets you hired.",
+          primaryButton: "Start for Free",
+          secondaryButton: "View Preview",
+          trustIndicator: "Trusted by 10,000+ job seekers",
         },
-        {
-          title: "محسّن لأنظمة التتبع",
+        features: {
+          title: "Build a Professional CV",
+          subtitle: "That stands out from the crowd",
+          items: [
+            {
+              title: "ATS-Optimized",
+              description: "Ensure your CV gets seen by recruiters",
+            },
+            {
+              title: "AI-Powered Suggestions",
+              description: "Get smart recommendations for your content",
+            },
+            {
+              title: "Instant PDF Export",
+              description: "Download your CV in professional format",
+            },
+          ],
+          badges: {
+            free: "Free",
+            atsCompliant: "ATS Compliant",
+            aiPowered: "AI Powered",
+            instantPdf: "Instant PDF",
+          },
+        },
+        benefits: {
+          title: "Why Choose Our CV Builder?",
+          subtitle: "We make CV creation simple and effective",
+          items: [
+            {
+              title: "Easy to Use",
+              description:
+                "Simple and intuitive interface that makes CV building a breeze",
+            },
+            {
+              title: "Professional Templates",
+              description:
+                "Templates designed by hiring experts to maximize impact",
+            },
+            {
+              title: "Real-time Preview",
+              description: "See your changes instantly as you type",
+            },
+          ],
+        },
+        cta: {
+          title: "Ready to create your perfect CV?",
           description:
-            "جميع القوالب مصممة لاجتياز أنظمة تتبع المتقدمين المستخدمة من قبل 99% من الشركات.",
+            "Join thousands of successful professionals who used our platform to land their dream jobs.",
+          button: "Start Now for Free",
+          disclaimer: "Free to use. No credit card required.",
         },
-        {
-          title: "جودة مهنية",
+        footer: {
           description:
-            "تنسيق وتصميم بمعايير الصناعة يُعجب مديري التوظيف والمختصين.",
+            "The AI-powered CV builder that helps you land your dream job.",
+          copyright: "© 2024 CV Builder. All rights reserved.",
         },
-        {
-          title: "سريع وسهل",
+      },
+      jobs: {
+        header: {
+          title: "Job Search",
           description:
-            "اصنع سيرتك الذاتية الكاملة في أقل من 10 دقائق بواجهتنا البديهية للسحب والإفلات.",
+            "Find your dream job with our AI-powered search platform",
         },
-      ],
+        hero: {
+          comingSoonBadge: "Coming Soon",
+          title: "Job Finder",
+          subtitle: "AI-Powered",
+          description:
+            "The next-generation job search platform that connects you with top companies using advanced AI",
+          searchPlaceholder: {
+            jobTitle: "Job title, keywords...",
+            location: "Location, city...",
+            searchButton: "Search Jobs",
+          },
+          featureComingSoon: "Feature coming soon",
+        },
+        features: {
+          aiSearch: {
+            title: "AI-Powered Search",
+            description:
+              "Smart algorithms that match your skills with the best job opportunities",
+          },
+          topCompanies: {
+            title: "Top Companies",
+            description:
+              "Exclusive access to jobs at leading companies and innovative startups",
+          },
+          jobAlerts: {
+            title: "Smart Job Alerts",
+            description:
+              "Get instant notifications when perfect job matches become available",
+          },
+        },
+        cta: {
+          title: "Ready to find your dream job?",
+          description:
+            "Join thousands of professionals who found their perfect positions with us",
+          button: "Start Job Search",
+        },
+        preview: {
+          title: "Job Preview",
+          description:
+            "Explore a sample of the best job opportunities coming soon",
+          featured: "Featured",
+        },
+      },
     },
-    cta: {
-      title: "مستعد للحصول على وظيفة أحلامك؟",
-      description:
-        "انضم إلى آلاف المهنيين الذين بنوا حياتهم المهنية بنجاح باستخدام منشئ السيرة الذاتية الخاص بنا.",
-      button: "أنشئ سيرتك الذاتية الآن",
-      disclaimer: "لا حاجة للتسجيل • مجاني إلى الأبد • نتائج مهنية",
-    },
-    footer: {
-      description:
-        "اصنع سيرة ذاتية مهنية ومتوافقة مع أنظمة التتبع تحقق النتائج. ابدأ رحلتك المهنية اليوم.",
-      copyright:
-        "© 2024 CVIFI. مصنوع بـ ❤️ للباحثين عن العمل في جميع أنحاء العالم.",
-    },
-  },
-};
+  };
+
+  return translations[language] || translations.en;
+}

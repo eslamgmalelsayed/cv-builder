@@ -25,7 +25,7 @@ export function PDFExportButton({ cvData }: PDFExportButtonProps) {
       let jobTitle = title;
       if (!jobTitle && cvData?.experience && cvData.experience.length > 0) {
         // Use the first experience entry as the most recent job title
-        jobTitle = cvData.experience[0]?.title || "";
+        jobTitle = cvData.experience[0]?.jobTitle || "";
       }
 
       // Default to "CV" if no title is available

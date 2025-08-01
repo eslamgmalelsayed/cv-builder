@@ -11,6 +11,7 @@ import { SkillsForm } from "./skills-form";
 import { CustomSectionForm } from "./custom-section-form";
 import { CVPreview } from "./cv-preview";
 import { ATSScore } from "./ats-score";
+import { EnhancedAIAssistant } from "./enhanced-ai-assistant";
 import { ThemeCustomizer } from "./theme-customizer";
 import { SaveStatus } from "./save-status";
 import { Eye, Sparkles } from "lucide-react";
@@ -177,6 +178,57 @@ export function CVBuilder() {
     items.splice(result.destination.index, 0, reorderedItem);
 
     updateSectionOrder(items);
+  };
+
+  // Function to apply AI suggestions to CV data
+  const handleApplySuggestion = (
+    fieldPath: string,
+    newValue: string,
+    suggestionId: string
+  ) => {
+    const parts = fieldPath.split(".");
+
+    // Create a deep copy of current CV data
+    const updatedData = JSON.parse(JSON.stringify(cvData));
+
+    // Navigate to the field and update it
+    let current = updatedData;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i];
+      if (/^\d+$/.test(part)) {
+        // Handle array index
+        current = current[parseInt(part)];
+      } else {
+        // Handle object property
+        if (!current[part]) {
+          current[part] = {};
+        }
+        current = current[part];
+      }
+    }
+
+    // Set the final value
+    const finalPart = parts[parts.length - 1];
+    if (/^\d+$/.test(finalPart)) {
+      current[parseInt(finalPart)] = newValue;
+    } else {
+      current[finalPart] = newValue;
+    }
+
+    // Update the appropriate section based on the field path
+    if (fieldPath.startsWith("personalInfo")) {
+      updatePersonalInfo(updatedData.personalInfo);
+    } else if (fieldPath.startsWith("experience")) {
+      updateExperience(updatedData.experience || []);
+    } else if (fieldPath.startsWith("education")) {
+      updateEducation(updatedData.education || []);
+    } else if (fieldPath.startsWith("skills")) {
+      updateSkills(updatedData.skills || {});
+    }
+
+    console.log(
+      `Applied suggestion ${suggestionId}: Updated ${fieldPath} with new value`
+    );
   };
 
   const handleDirectionChange = (newDirection: "ltr" | "rtl") => {
@@ -404,7 +456,11 @@ export function CVBuilder() {
 
         {showAI && (
           <div className="lg:sticky lg:top-4">
-            <ATSScore cvData={cvData} language={language} />
+            <EnhancedAIAssistant
+              cvData={cvData}
+              language={language}
+              onApplySuggestion={handleApplySuggestion}
+            />
           </div>
         )}
       </div>

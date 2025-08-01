@@ -67,6 +67,23 @@ export function CVPreview({
   onDeleteCustomSection,
   isPreviewMode = false,
 }: CVPreviewProps) {
+  // Ensure skills data is properly formatted as arrays
+  const safeData = {
+    ...data,
+    skills: {
+      technical: Array.isArray(data.skills?.technical)
+        ? data.skills.technical
+        : [],
+      soft: Array.isArray(data.skills?.soft) ? data.skills.soft : [],
+      languages: Array.isArray(data.skills?.languages)
+        ? data.skills.languages
+        : [],
+      certifications: Array.isArray(data.skills?.certifications)
+        ? data.skills.certifications
+        : [],
+    },
+  };
+
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
 
@@ -157,6 +174,10 @@ export function CVPreview({
                 {data.personalInfo.location}
               </div>
             )}
+          </div>
+
+          {/* Website Links - Each on its own line */}
+          <div className="mt-2 space-y-1 text-sm text-gray-600">
             {data.personalInfo.linkedIn && (
               <a
                 href={
@@ -271,7 +292,7 @@ export function CVPreview({
 
                   {customSection.type === "text" && (
                     <div className="text-gray-700 text-sm leading-relaxed">
-                      <ul className="list-disc list-outside space-y-1 hanging-indent-bullet">
+                      <ul className="list-disc list-outside space-y-1 hanging-indent-bullet pdf-bullet-list">
                         {customSection.content
                           .split("\n")
                           .filter((line) => line.trim())
@@ -306,7 +327,7 @@ export function CVPreview({
                           </div>
                           {item.description && (
                             <div className="text-gray-700 text-sm leading-relaxed">
-                              <ul className="list-disc list-outside space-y-1 hanging-indent-bullet">
+                              <ul className="list-disc list-outside space-y-1 hanging-indent-bullet pdf-bullet-list">
                                 {item.description
                                   .split("\n")
                                   .filter((line) => line.trim())
@@ -358,7 +379,7 @@ export function CVPreview({
                           </div>
                           {exp.description && (
                             <div className="text-gray-700 text-sm leading-relaxed">
-                              <ul className="list-disc list-outside space-y-1 hanging-indent-bullet">
+                              <ul className="list-disc list-outside space-y-1 hanging-indent-bullet pdf-bullet-list">
                                 {exp.description
                                   .split("\n")
                                   .filter((line) => line.trim())
@@ -421,25 +442,25 @@ export function CVPreview({
               case "skills":
                 return (
                   <div key="skills" className="space-y-4">
-                    {data.skills.technical.length > 0 && (
+                    {safeData.skills.technical.length > 0 && (
                       <div>
                         <h2 className="text-xl font-bold text-primary mb-2 border-b border-primary/30 pb-1">
                           {labels.technicalSkills}
                         </h2>
                         <p className="text-gray-700">
-                          {data.skills.technical.join(", ")}
+                          {safeData.skills.technical.join(", ")}
                         </p>
                       </div>
                     )}
 
-                    {data.skills.soft.length > 0 && (
+                    {safeData.skills.soft.length > 0 && (
                       <div>
                         <h2 className="text-xl font-bold text-primary mb-2 border-b border-primary/30 pb-1">
                           {labels.coreCompetencies}
                         </h2>
                         <div className="text-gray-700">
-                          <ul className="list-disc list-outside space-y-1 hanging-indent-bullet">
-                            {data.skills.soft.map((skill, index) => (
+                          <ul className="list-disc list-outside space-y-1 hanging-indent-bullet pdf-bullet-list">
+                            {safeData.skills.soft.map((skill, index) => (
                               <li key={index}>{skill}</li>
                             ))}
                           </ul>
@@ -447,24 +468,24 @@ export function CVPreview({
                       </div>
                     )}
 
-                    {data.skills.languages.length > 0 && (
+                    {safeData.skills.languages.length > 0 && (
                       <div>
                         <h2 className="text-xl font-bold text-primary mb-2 border-b border-primary/30 pb-1">
                           {labels.languages}
                         </h2>
                         <p className="text-gray-700">
-                          {data.skills.languages.join(", ")}
+                          {safeData.skills.languages.join(", ")}
                         </p>
                       </div>
                     )}
 
-                    {data.skills.certifications.length > 0 && (
+                    {safeData.skills.certifications.length > 0 && (
                       <div>
                         <h2 className="text-xl font-bold text-primary mb-2 border-b border-primary/30 pb-1">
                           {labels.certifications}
                         </h2>
                         <p className="text-gray-700">
-                          {data.skills.certifications.join(", ")}
+                          {safeData.skills.certifications.join(", ")}
                         </p>
                       </div>
                     )}

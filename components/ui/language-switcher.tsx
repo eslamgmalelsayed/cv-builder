@@ -36,102 +36,84 @@ const languages: Language[] = [
 ];
 
 interface LanguageSwitcherProps {
+  currentLanguage?: string;
   onLanguageChange?: (language: Language) => void;
   className?: string;
 }
 
 export function LanguageSwitcher({
+  currentLanguage: propCurrentLanguage,
   onLanguageChange,
   className,
 }: LanguageSwitcherProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(
-    languages[0]
-  );
   const [mounted, setMounted] = useState(false);
+
+  // Get current language object
+  const getCurrentLanguage = () => {
+    const langCode = propCurrentLanguage || "ar";
+    return languages.find((lang) => lang.code === langCode) || languages[1];
+  };
+
+  const currentLanguage = getCurrentLanguage();
 
   useEffect(() => {
     setMounted(true);
-    // Check if there's a saved language preference
-    const savedLang = localStorage.getItem("preferred-language");
-    if (savedLang) {
-      const found = languages.find((lang) => lang.code === savedLang);
-      if (found) {
-        setCurrentLanguage(found);
-        document.documentElement.dir = found.dir;
-        document.documentElement.lang = found.code;
-        if (found.dir === "rtl") {
-          document.body.classList.add("font-cairo");
-          document.body.classList.remove("font-inter");
-        } else {
-          document.body.classList.add("font-inter");
-          document.body.classList.remove("font-cairo");
-        }
-      }
-    }
   }, []);
 
   const handleLanguageChange = (language: Language) => {
-    setCurrentLanguage(language);
-
-    // Update HTML attributes
-    document.documentElement.dir = language.dir;
-    document.documentElement.lang = language.code;
-
-    // Update font family based on language
-    if (language.dir === "rtl") {
-      document.body.classList.add("font-cairo");
-      document.body.classList.remove("font-inter");
-    } else {
-      document.body.classList.add("font-inter");
-      document.body.classList.remove("font-cairo");
-    }
-
     // Save preference
     localStorage.setItem("preferred-language", language.code);
 
-    // Notify parent component
+    // Notify parent component - let the context handle DOM updates
     onLanguageChange?.(language);
   };
 
   if (!mounted) {
-    return null;
+    return (
+      <Button variant="outline" size="sm" className="gap-2 min-w-[120px]">
+        <Globe className="h-4 w-4" />
+        <span>Loading...</span>
+      </Button>
+    );
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`gap-2 min-w-[120px] ${className}`}
-        >
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">
-            {currentLanguage.flag} {currentLanguage.nativeName}
-          </span>
-          <span className="sm:hidden">{currentLanguage.flag}</span>
-          <ChevronDown className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[150px]">
-        {languages.map((language) => (
-          <DropdownMenuItem
-            key={language.code}
-            onClick={() => handleLanguageChange(language)}
-            className={`cursor-pointer ${
-              currentLanguage.code === language.code ? "bg-accent" : ""
-            }`}
+    <div className="relative">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={`gap-2 min-w-[120px] ${className}`}
           >
-            <span className="mr-2">{language.flag}</span>
-            <div className="flex flex-col">
-              <span className="font-medium">{language.nativeName}</span>
-              <span className="text-xs text-muted-foreground">
-                {language.name}
-              </span>
-            </div>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <Globe className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {currentLanguage.flag} {currentLanguage.nativeName}
+            </span>
+            <span className="sm:hidden">{currentLanguage.flag}</span>
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-[150px] z-[60]">
+          {languages.map((language) => (
+            <DropdownMenuItem
+              key={language.code}
+              onClick={() => handleLanguageChange(language)}
+              className={`cursor-pointer ${
+                currentLanguage.code === language.code ? "bg-accent" : ""
+              }`}
+            >
+              <span className="mr-2">{language.flag}</span>
+              <div className="flex flex-col">
+                <span className="font-medium">{language.nativeName}</span>
+                <span className="text-xs text-muted-foreground">
+                  {language.name}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

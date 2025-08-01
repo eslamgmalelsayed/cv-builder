@@ -81,6 +81,16 @@ export function SkillsForm({
     certifications: "",
   });
 
+  // Ensure skills data is properly formatted as arrays
+  const safeData = {
+    technical: Array.isArray(data?.technical) ? data.technical : [],
+    soft: Array.isArray(data?.soft) ? data.soft : [],
+    languages: Array.isArray(data?.languages) ? data.languages : [],
+    certifications: Array.isArray(data?.certifications)
+      ? data.certifications
+      : [],
+  };
+
   const t = translations[language];
   const skillNames = skillTypeNames[language];
 
@@ -88,23 +98,23 @@ export function SkillsForm({
     (category: keyof CVData["skills"], skill: string) => {
       if (skill.trim()) {
         onChange({
-          ...data,
-          [category]: [...data[category], skill.trim()],
+          ...safeData,
+          [category]: [...safeData[category], skill.trim()],
         });
         setNewSkill((prev) => ({ ...prev, [category]: "" }));
       }
     },
-    [data, onChange]
+    [safeData, onChange]
   );
 
   const removeSkill = useCallback(
     (category: keyof CVData["skills"], index: number) => {
       onChange({
-        ...data,
-        [category]: data[category].filter((_, i) => i !== index),
+        ...safeData,
+        [category]: safeData[category].filter((_, i) => i !== index),
       });
     },
-    [data, onChange]
+    [safeData, onChange]
   );
 
   const handleKeyPress = useCallback(
@@ -156,7 +166,7 @@ export function SkillsForm({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {data[category].map((skill, index) => (
+          {safeData[category].map((skill, index) => (
             <Badge
               key={`${skill}-${index}`}
               variant="secondary"
@@ -174,7 +184,7 @@ export function SkillsForm({
           ))}
         </div>
 
-        {data[category].length === 0 && (
+        {safeData[category].length === 0 && (
           <p className="text-sm text-gray-500">
             {t.noSkillsAdded.replace("{type}", skillNames[category])}
           </p>
