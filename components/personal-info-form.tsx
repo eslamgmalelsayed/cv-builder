@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
 import { AIInput, AITextarea } from "@/components/ui/ai-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { CVData } from "./cv-builder";
-import { useCVData } from "@/hooks/use-cv-data";
 
 interface PersonalInfoFormProps {
   data: CVData["personalInfo"];
@@ -70,16 +68,6 @@ export function PersonalInfoForm({
   language = "en",
   cvData,
 }: PersonalInfoFormProps) {
-  const { saveOnBlur } = useCVData();
-
-  // Ensure title field exists and initialize it properly
-  useEffect(() => {
-    if (!data.hasOwnProperty("title") || data.title === undefined) {
-      const updatedData = { ...data, title: "" };
-      onChange(updatedData);
-    }
-  }, []); // Only run once on mount
-
   const handleChange = (field: keyof CVData["personalInfo"], value: string) => {
     const updatedData = { ...data, [field]: value };
     onChange(updatedData);
@@ -99,7 +87,6 @@ export function PersonalInfoForm({
             id="fullName"
             value={data.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.fullNamePlaceholder}
             className={`input-clean ${isRTL ? "text-right" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
@@ -116,7 +103,6 @@ export function PersonalInfoForm({
             id="title"
             value={data.title || ""}
             onChange={(e) => handleChange("title", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.titlePlaceholder}
             className={`input-clean ${isRTL ? "text-right" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
@@ -137,7 +123,6 @@ export function PersonalInfoForm({
             type="email"
             value={data.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.emailPlaceholder}
             className="input-clean ltr-content"
             style={{ textAlign: "left" }}
@@ -154,7 +139,6 @@ export function PersonalInfoForm({
             id="phone"
             value={data.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.phonePlaceholder}
             className="input-clean ltr-content"
             style={{ textAlign: "left" }}
@@ -168,7 +152,6 @@ export function PersonalInfoForm({
             id="location"
             value={data.location}
             onChange={(e) => handleChange("location", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.locationPlaceholder}
             className={`input-clean ${isRTL ? "text-right" : ""}`}
             style={isRTL ? { textAlign: "right" } : {}}
@@ -185,7 +168,6 @@ export function PersonalInfoForm({
             id="linkedIn"
             value={data.linkedIn}
             onChange={(e) => handleChange("linkedIn", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.linkedInPlaceholder}
             className="input-clean ltr-content"
             style={{ textAlign: "left" }}
@@ -199,7 +181,6 @@ export function PersonalInfoForm({
             id="website"
             value={data.website}
             onChange={(e) => handleChange("website", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.websitePlaceholder}
             className="input-clean ltr-content"
             style={{ textAlign: "left" }}
@@ -216,7 +197,6 @@ export function PersonalInfoForm({
             id="github"
             value={data.github}
             onChange={(e) => handleChange("github", e.target.value)}
-            onBlur={saveOnBlur}
             placeholder={t.githubPlaceholder}
             className="input-clean ltr-content"
             style={{ textAlign: "left" }}
@@ -232,7 +212,6 @@ export function PersonalInfoForm({
           id="summary"
           value={data.summary}
           onChange={(e) => handleChange("summary", e.target.value)}
-          onBlur={saveOnBlur}
           placeholder={t.summaryPlaceholder}
           rows={4}
           className={`textarea-clean ${isRTL ? "text-right" : ""}`}

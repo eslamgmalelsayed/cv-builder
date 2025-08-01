@@ -136,7 +136,7 @@ export const homePageContent: Record<string, HomePageContent> = {
     footer: {
       description:
         "Build professional, ATS-compliant resumes that get results. Start your career journey today.",
-      copyright: "© 2024 CVIFI. Built with ❤️ for job seekers worldwide.",
+      copyright: "© 2025 CVIFI. Built with ❤️ for job seekers worldwide.",
     },
   },
   ar: {

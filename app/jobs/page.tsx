@@ -332,7 +332,7 @@ export default function JobsFinderPage() {
       <footer className="bg-background border-t py-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted-foreground">
-            &copy; 2024 CVIFI. Built with ❤️ for job seekers worldwide.
+            &copy; 2025 CVIFI. Built with ❤️ for job seekers worldwide.
           </p>
         </div>
       </footer>

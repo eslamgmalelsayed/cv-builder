@@ -75,7 +75,7 @@ const getDefaultState = (): CVState => ({
 });
 
 const STORAGE_KEY = "cv-builder-state";
-const AUTO_SAVE_DELAY = 300; // 300ms for faster response
+const AUTO_SAVE_DELAY = 100; // Reduced to 100ms for faster saving
 
 export function useCVData() {
   const [state, setState] = useState<CVState>(getDefaultState());
@@ -102,8 +102,6 @@ export function useCVData() {
             personalInfo: {
               ...defaultState.cvData.personalInfo,
               ...parsedState.cvData.personalInfo,
-              // Ensure title field exists
-              title: parsedState.cvData.personalInfo?.title || "",
             },
             skills: {
               ...defaultState.cvData.skills,
@@ -125,45 +123,6 @@ export function useCVData() {
       setIsLoaded(true);
     }
   }, []);
-
-  // Auto-save to localStorage with debouncing
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    const timeoutId = setTimeout(() => {
-      setIsSaving(true);
-      try {
-        const stateToSave: CVState = {
-          ...state,
-          lastSaved: new Date().toISOString(),
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-        setLastSaveTime(new Date());
-      } catch (error) {
-        console.error("Error saving CV data to localStorage:", error);
-      } finally {
-        setIsSaving(false);
-      }
-    }, AUTO_SAVE_DELAY);
-
-    return () => clearTimeout(timeoutId);
-  }, [state, isLoaded]);
-
-  // Immediate save function for critical updates
-  const saveImmediately = useCallback(() => {
-    if (!isLoaded) return;
-
-    try {
-      const stateToSave: CVState = {
-        ...state,
-        lastSaved: new Date().toISOString(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-      setLastSaveTime(new Date());
-    } catch (error) {
-      console.error("Error saving CV data to localStorage:", error);
-    }
-  }, [state, isLoaded]);
 
   // Helper function to update state and save immediately
   const updateStateAndSave = useCallback(
@@ -243,45 +202,56 @@ export function useCVData() {
     [updateStateAndSave]
   );
 
-  const addCustomSection = useCallback((section: CustomSection) => {
-    const newSectionId = `custom-${section.id}`;
-    setState((prev) => ({
-      ...prev,
-      cvData: {
-        ...prev.cvData,
-        customSections: [...prev.cvData.customSections, section],
-      },
-      sectionOrder: [...prev.sectionOrder, newSectionId],
-      visibleSections: { ...prev.visibleSections, [newSectionId]: true },
-    }));
-  }, []);
-
-  const removeCustomSection = useCallback((sectionId: string) => {
-    const customSectionKey = `custom-${sectionId}`;
-    setState((prev) => {
-      const newSectionNames = { ...prev.sectionNames };
-      const newVisibleSections = { ...prev.visibleSections };
-      delete newSectionNames[customSectionKey];
-      delete newVisibleSections[customSectionKey];
-
-      return {
+  const addCustomSection = useCallback(
+    (section: CustomSection) => {
+      const newSectionId = `custom-${section.id}`;
+      updateStateAndSave((prev) => ({
         ...prev,
         cvData: {
           ...prev.cvData,
-          customSections: prev.cvData.customSections.filter(
-            (section) => section.id !== sectionId
-          ),
+          customSections: [...prev.cvData.customSections, section],
         },
-        sectionOrder: prev.sectionOrder.filter((id) => id !== customSectionKey),
-        sectionNames: newSectionNames,
-        visibleSections: newVisibleSections,
-      };
-    });
-  }, []);
+        sectionOrder: [...prev.sectionOrder, newSectionId],
+        visibleSections: { ...prev.visibleSections, [newSectionId]: true },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateSectionOrder = useCallback((sectionOrder: string[]) => {
-    setState((prev) => ({ ...prev, sectionOrder }));
-  }, []);
+  const removeCustomSection = useCallback(
+    (sectionId: string) => {
+      const customSectionKey = `custom-${sectionId}`;
+      updateStateAndSave((prev) => {
+        const newSectionNames = { ...prev.sectionNames };
+        const newVisibleSections = { ...prev.visibleSections };
+        delete newSectionNames[customSectionKey];
+        delete newVisibleSections[customSectionKey];
+
+        return {
+          ...prev,
+          cvData: {
+            ...prev.cvData,
+            customSections: prev.cvData.customSections.filter(
+              (section) => section.id !== sectionId
+            ),
+          },
+          sectionOrder: prev.sectionOrder.filter(
+            (id) => id !== customSectionKey
+          ),
+          sectionNames: newSectionNames,
+          visibleSections: newVisibleSections,
+        };
+      });
+    },
+    [updateStateAndSave]
+  );
+
+  const updateSectionOrder = useCallback(
+    (sectionOrder: string[]) => {
+      updateStateAndSave((prev) => ({ ...prev, sectionOrder }));
+    },
+    [updateStateAndSave]
+  );
 
   const toggleSectionVisibility = useCallback(
     (section: string) => {
@@ -296,28 +266,43 @@ export function useCVData() {
     [updateStateAndSave]
   );
 
-  const updateSectionName = useCallback((section: string, name: string) => {
-    setState((prev) => ({
-      ...prev,
-      sectionNames: { ...prev.sectionNames, [section]: name },
-    }));
-  }, []);
+  const updateSectionName = useCallback(
+    (section: string, name: string) => {
+      updateStateAndSave((prev) => ({
+        ...prev,
+        sectionNames: { ...prev.sectionNames, [section]: name },
+      }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateDirection = useCallback((direction: "ltr" | "rtl") => {
-    setState((prev) => ({ ...prev, direction }));
-  }, []);
+  const updateDirection = useCallback(
+    (direction: "ltr" | "rtl") => {
+      updateStateAndSave((prev) => ({ ...prev, direction }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateLanguage = useCallback((language: "en" | "ar") => {
-    setState((prev) => ({ ...prev, language }));
-  }, []);
+  const updateLanguage = useCallback(
+    (language: "en" | "ar") => {
+      updateStateAndSave((prev) => ({ ...prev, language }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateThemeColor = useCallback((themeColor: string) => {
-    setState((prev) => ({ ...prev, themeColor }));
-  }, []);
+  const updateThemeColor = useCallback(
+    (themeColor: string) => {
+      updateStateAndSave((prev) => ({ ...prev, themeColor }));
+    },
+    [updateStateAndSave]
+  );
 
-  const updateCVData = useCallback((cvData: CVData) => {
-    setState((prev) => ({ ...prev, cvData }));
-  }, []);
+  const updateCVData = useCallback(
+    (cvData: CVData) => {
+      updateStateAndSave((prev) => ({ ...prev, cvData }));
+    },
+    [updateStateAndSave]
+  );
 
   // Clear all data and reset to defaults - COMPLETE RESET
   const clearAllData = useCallback(() => {
