@@ -9,6 +9,13 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Redirect API routes to Netlify functions as fallback
+[[redirects]]
+  from = "/api/ai-ats-analysis"
+  to = "/.netlify/functions/ai-ats-analysis"
+  status = 200
+  force = false
+
 [[headers]]
   for = "/*"
   [headers.values]
