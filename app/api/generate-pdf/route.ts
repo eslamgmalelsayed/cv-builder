@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const { html, fileName } = await request.json();

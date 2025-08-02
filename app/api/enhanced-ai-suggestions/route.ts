@@ -3,6 +3,8 @@ import { generateObject } from "ai";
 import { groq } from "@ai-sdk/groq";
 import { z } from "zod";
 
+export const runtime = 'nodejs';
+
 const EnhancedSuggestionSchema = z.object({
   suggestions: z.array(
     z.object({

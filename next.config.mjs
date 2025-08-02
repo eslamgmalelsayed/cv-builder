@@ -21,6 +21,11 @@ const nextConfig = {
     serverComponentsExternalPackages: [],
   },
 
+  // Ensure API routes are included in build
+  generateBuildId: async () => {
+    return 'cv-builder-' + Date.now();
+  },
+
   // Webpack configuration for better performance
   webpack: (config, { dev, isServer }) => {
     // Optimize bundle size
