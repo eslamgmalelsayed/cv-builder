@@ -8,6 +8,10 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+[functions]
+  # Increase timeout for AI API calls
+  timeout = 60
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -50,12 +54,6 @@
   from = "/cv-builder"
   to = "/"
   status = 301
-
-# Fallback for client-side routing (Next.js)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 # Environment variables for production
 [context.production.environment]
