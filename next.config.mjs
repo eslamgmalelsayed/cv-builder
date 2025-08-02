@@ -1,11 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Netlify will handle deployment - removed static export to enable API routes
-  // output: "export", // Commented out to enable API routes
+  // Enable static export for GitHub Pages
+  output: "export",
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
 
-  // Image optimization
+  // GitHub Pages settings
+  basePath: process.env.NODE_ENV === 'production' ? '/cv-builder' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/cv-builder/' : '',
+
+  // Image optimization - must be disabled for static export
   images: {
     unoptimized: true,
     domains: ["fonts.googleapis.com", "fonts.gstatic.com"],
