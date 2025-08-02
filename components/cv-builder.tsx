@@ -20,6 +20,7 @@ import { SectionReorder } from "./section-reorder";
 import { PDFExportButton } from "./pdf-export-button";
 import { useCVData } from "@/hooks/use-cv-data";
 import { useAlertModal } from "@/components/ui/alert-modal";
+import { useLanguage } from "./shared-header";
 
 export interface CustomSection {
   id: string;
@@ -108,6 +109,9 @@ const translations = {
 };
 
 export function CVBuilder() {
+  const { currentLanguage, handleLanguageChange: setGlobalLanguage } =
+    useLanguage();
+
   const {
     // State
     isLoaded,
@@ -146,6 +150,13 @@ export function CVBuilder() {
   >(null);
   const [activeTab, setActiveTab] = useState("personalInfo");
   const { showConfirm, AlertModalComponent } = useAlertModal();
+
+  // Sync global language context with CV data language
+  useEffect(() => {
+    if (isLoaded && currentLanguage !== language) {
+      updateLanguage(currentLanguage as "en" | "ar");
+    }
+  }, [currentLanguage, language, isLoaded, updateLanguage]);
 
   // Apply theme and language settings on load and when clearTrigger changes
   useEffect(() => {
@@ -236,6 +247,8 @@ export function CVBuilder() {
   };
 
   const handleLanguageChange = (newLanguage: "en" | "ar") => {
+    // Update both the global context and CV data
+    setGlobalLanguage({ code: newLanguage });
     updateLanguage(newLanguage);
   };
 
