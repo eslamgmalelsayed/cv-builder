@@ -149,7 +149,26 @@ export function EnhancedAIAssistant({
 
     setIsAnalyzing(true);
     try {
-      // Get enhanced AI suggestions which includes ATS score
+      // First get ATS analysis
+      const atsResponse = await fetch("/api/ai-ats-analysis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cvData,
+          language,
+        }),
+      });
+
+      if (!atsResponse.ok) {
+        throw new Error(`ATS analysis failed: ${atsResponse.status}`);
+      }
+
+      const atsAnalysis = await atsResponse.json();
+      setAtsAnalysis(atsAnalysis);
+
+      // Then get detailed suggestions
       const suggestionsResponse = await fetch("/api/enhanced-ai-suggestions", {
         method: "POST",
         headers: {
@@ -166,41 +185,7 @@ export function EnhancedAIAssistant({
       }
 
       const suggestionsData = await suggestionsResponse.json();
-      
-      // Set suggestions
       setSuggestions(suggestionsData.suggestions || []);
-      
-      // Create a basic ATS analysis from the response
-      const basicAtsAnalysis = {
-        atsScore: suggestionsData.atsScore || 0,
-        overallFeedback: suggestionsData.overallFeedback || "",
-        categories: {
-          content: {
-            score: suggestionsData.atsScore || 0,
-            feedback: suggestionsData.overallFeedback || "",
-            suggestions: (suggestionsData.suggestions || []).map((s: any) => s.title)
-          }
-        },
-        prioritySuggestions: (suggestionsData.suggestions || []).slice(0, 3).map((s: any, index: number) => ({
-          id: s.id,
-          type: s.priority === "high" ? "critical" : s.priority === "medium" ? "important" : "nice-to-have" as const,
-          section: s.section,
-          title: s.title,
-          description: s.description,
-          impact: s.priority === "high" ? "high" : s.priority === "medium" ? "medium" : "low" as const,
-          originalText: s.originalText,
-          suggestedText: s.suggestedText,
-          fieldPath: s.fieldPath
-        })),
-        missingElements: (suggestionsData.suggestions || [])
-          .filter((s: any) => s.type === "format")
-          .map((s: any) => s.title),
-        strengths: (suggestionsData.suggestions || [])
-          .filter((s: any) => s.type === "improvement" && s.priority === "low")
-          .map((s: any) => s.title)
-      };
-      
-      setAtsAnalysis(basicAtsAnalysis);
     } catch (error) {
       console.error("Error analyzing CV:", error);
       showAlert(
