@@ -18,6 +18,7 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters module issues
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+    serverComponentsExternalPackages: [],
   },
 
   // Webpack configuration for better performance
