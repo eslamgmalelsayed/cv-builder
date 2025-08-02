@@ -22,9 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { WarpBackground } from "@/components/ui/warp-background";
 import { useLanguage } from "@/components/shared-header";
-import { getTranslations, type AppTranslations } from "@/lib/content";
-import Link from "next/link";
-import Image from "next/image";
+import { useContent } from "@/hooks/use-content";
 
 import { SharedFooter } from "@/components/ui/shared-footer";
 
@@ -84,7 +82,7 @@ export default function JobsFinderPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
   const [mounted, setMounted] = useState(false);
-  const content = getTranslations(currentLanguage);
+  const content = useContent();
 
   useEffect(() => {
     setMounted(true);
@@ -236,9 +234,9 @@ export default function JobsFinderPage() {
 
             {/* CTA */}
             <div className="pt-8 text-center">
-              <div className="inline-flex items-center gap-4 bg-white/10 dark:bg-black/10 backdrop-blur-sm rounded-xl p-6 border">
-                <Bell className="w-8 h-8 text-blue-500" />
-                <div className="text-center">
+              <div className="flex flex-col sm:flex-row items-center gap-4 bg-white/10 dark:bg-black/10 backdrop-blur-sm rounded-xl p-6 border max-w-lg mx-auto">
+                <Bell className="w-8 h-8 text-blue-500 flex-shrink-0" />
+                <div className="text-center flex-1">
                   <h4 className="font-semibold text-center">
                     {content.jobs.cta.title}
                   </h4>
@@ -246,7 +244,11 @@ export default function JobsFinderPage() {
                     {content.jobs.cta.description}
                   </p>
                 </div>
-                <Button variant="outline" disabled>
+                <Button
+                  variant="outline"
+                  disabled
+                  className="w-full sm:w-auto flex-shrink-0"
+                >
                   {content.jobs.cta.button}
                 </Button>
               </div>
@@ -288,7 +290,7 @@ export default function JobsFinderPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="text-xl">{job.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-4 mt-2">
+                      <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-4 h-4" />
                           {job.company}
@@ -306,16 +308,24 @@ export default function JobsFinderPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <div className="flex flex-wrap gap-2">
                       <Badge variant="outline">{job.type}</Badge>
                       <Badge variant="outline" className="text-green-600">
                         {job.salary}
                       </Badge>
                     </div>
-                    <Button disabled variant="outline">
+                    <Button
+                      disabled
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
                       Apply Now
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <ArrowRight
+                        className={`w-4 h-4 ${
+                          currentLanguage === "ar" ? "mr-2 rotate-180" : "ml-2"
+                        }`}
+                      />
                     </Button>
                   </div>
                 </CardContent>

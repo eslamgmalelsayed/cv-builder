@@ -349,21 +349,38 @@ export function CVBuilder() {
                         key={clearTrigger}
                       >
                         <TabsList
-                          className={`grid w-full grid-cols-5 ${
+                          className={`w-full flex overflow-x-auto scrollbar-hide gap-1 ${
                             direction === "rtl" ? "flex-row-reverse" : ""
                           }`}
                         >
-                          <TabsTrigger value="personalInfo">
+                          <TabsTrigger
+                            value="personalInfo"
+                            className="min-w-fit whitespace-nowrap px-3"
+                          >
                             {t.personal}
                           </TabsTrigger>
-                          <TabsTrigger value="experience">
+                          <TabsTrigger
+                            value="experience"
+                            className="min-w-fit whitespace-nowrap px-3"
+                          >
                             {t.experience}
                           </TabsTrigger>
-                          <TabsTrigger value="education">
+                          <TabsTrigger
+                            value="education"
+                            className="min-w-fit whitespace-nowrap px-3"
+                          >
                             {t.education}
                           </TabsTrigger>
-                          <TabsTrigger value="skills">{t.skills}</TabsTrigger>
-                          <TabsTrigger value="customSections">
+                          <TabsTrigger
+                            value="skills"
+                            className="min-w-fit whitespace-nowrap px-3"
+                          >
+                            {t.skills}
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="customSections"
+                            className="min-w-fit whitespace-nowrap px-3"
+                          >
                             {t.customSections}
                           </TabsTrigger>
                         </TabsList>

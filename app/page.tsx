@@ -1,23 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import { ArrowRight, Sparkles, Zap, FileText, Brain } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { WarpBackground } from "@/components/ui/warp-background";
 import { useLanguage } from "@/components/shared-header";
-import { getTranslations, type AppTranslations } from "@/lib/content";
+import { useContent } from "@/hooks/use-content";
 import { SharedFooter } from "@/components/ui/shared-footer";
 
 export default function Home() {
   const { currentLanguage } = useLanguage();
-  const [content, setContent] = useState<AppTranslations>(
-    getTranslations("ar")
-  );
-
-  useEffect(() => {
-    setContent(getTranslations(currentLanguage));
-  }, [currentLanguage]);
+  const content = useContent();
 
   return (
     <div
