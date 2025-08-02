@@ -8,10 +8,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[functions]
-  # Increase timeout for AI API calls
-  timeout = 60
-
 [[headers]]
   for = "/*"
   [headers.values]
