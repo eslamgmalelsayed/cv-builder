@@ -117,18 +117,19 @@ export function ATSScore({ cvData, language = "en" }: ATSScoreProps) {
       }
 
       const analysis = await response.json();
-      
+
       // Normalize the response structure to handle different API response formats
       const normalizedAnalysis = {
         atsScore: analysis.score || analysis.atsScore || 0,
         overallFeedback: analysis.feedback || analysis.overallFeedback || "",
         categories: analysis.categories || {},
-        improvementNotes: analysis.improvements || analysis.improvementNotes || [],
+        improvementNotes:
+          analysis.improvements || analysis.improvementNotes || [],
         missingElements: analysis.missingElements || [],
         strengths: analysis.strengths || [],
-        suggestions: analysis.suggestions || []
+        suggestions: analysis.suggestions || [],
       };
-      
+
       setAtsAnalysis(normalizedAnalysis);
     } catch (error) {
       console.error("Error analyzing ATS:", error);
@@ -395,7 +396,7 @@ export function ATSScore({ cvData, language = "en" }: ATSScoreProps) {
 
             {/* Category Breakdown */}
             {atsAnalysis.categories &&
-              typeof atsAnalysis.categories === 'object' &&
+              typeof atsAnalysis.categories === "object" &&
               Object.keys(atsAnalysis.categories).length > 0 && (
                 <div>
                   <h4 className="font-medium mb-3 flex items-center gap-2">
