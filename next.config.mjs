@@ -23,7 +23,7 @@ const nextConfig = {
 
   // Ensure API routes are included in build
   generateBuildId: async () => {
-    return 'cv-builder-' + Date.now();
+    return "cv-builder-" + Date.now();
   },
 
   // Webpack configuration for better performance
