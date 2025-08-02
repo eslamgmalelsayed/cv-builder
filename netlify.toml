@@ -16,6 +16,12 @@
   status = 200
   force = false
 
+[[redirects]]
+  from = "/api/enhanced-ai-suggestions"
+  to = "/.netlify/functions/enhanced-ai-suggestions"
+  status = 200
+  force = false
+
 [[headers]]
   for = "/*"
   [headers.values]
