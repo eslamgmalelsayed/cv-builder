@@ -1,4 +1,33 @@
-const { NextResponse } = require("next/server");
+const https = require('https');
+
+// Helper function to make HTTPS requests
+function makeHttpsRequest(url, options, data) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => {
+        try {
+          resolve({
+            ok: res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode,
+            json: () => Promise.resolve(JSON.parse(body))
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+    
+    req.on('error', reject);
+    
+    if (data) {
+      req.write(data);
+    }
+    
+    req.end();
+  });
+}
 
 exports.handler = async (event, context) => {
   // Handle CORS preflight
@@ -42,32 +71,36 @@ exports.handler = async (event, context) => {
     // Create comprehensive CV analysis prompt
     const prompt = createATSAnalysisPrompt(cvData, language);
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json",
+    const requestData = JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: `You are an ATS (Applicant Tracking System) expert and professional career advisor. 
+          Analyze the provided CV data and return a JSON response with specific, actionable feedback.`,
         },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content: `You are an ATS (Applicant Tracking System) expert and professional career advisor. 
-              Analyze the provided CV data and return a JSON response with specific, actionable feedback.`,
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 2000,
-        }),
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+
+    const options = {
+      hostname: 'api.groq.com',
+      port: 443,
+      path: '/openai/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(requestData)
       }
-    );
+    };
+
+    const response = await makeHttpsRequest('https://api.groq.com/openai/v1/chat/completions', options, requestData);
 
     if (!response.ok) {
       throw new Error(`Groq API error: ${response.status}`);
