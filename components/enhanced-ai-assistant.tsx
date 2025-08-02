@@ -414,7 +414,7 @@ export function EnhancedAIAssistant({
                     {t.categories}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {Object.entries(atsAnalysis.categories).map(
+                    {Object.entries(atsAnalysis.categories || {}).map(
                       ([category, data]) => (
                         <div
                           key={category}

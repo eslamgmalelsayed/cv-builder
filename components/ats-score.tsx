@@ -117,7 +117,19 @@ export function ATSScore({ cvData, language = "en" }: ATSScoreProps) {
       }
 
       const analysis = await response.json();
-      setAtsAnalysis(analysis);
+      
+      // Normalize the response structure to handle different API response formats
+      const normalizedAnalysis = {
+        atsScore: analysis.score || analysis.atsScore || 0,
+        overallFeedback: analysis.feedback || analysis.overallFeedback || "",
+        categories: analysis.categories || {},
+        improvementNotes: analysis.improvements || analysis.improvementNotes || [],
+        missingElements: analysis.missingElements || [],
+        strengths: analysis.strengths || [],
+        suggestions: analysis.suggestions || []
+      };
+      
+      setAtsAnalysis(normalizedAnalysis);
     } catch (error) {
       console.error("Error analyzing ATS:", error);
       showAlert(
@@ -383,6 +395,7 @@ export function ATSScore({ cvData, language = "en" }: ATSScoreProps) {
 
             {/* Category Breakdown */}
             {atsAnalysis.categories &&
+              typeof atsAnalysis.categories === 'object' &&
               Object.keys(atsAnalysis.categories).length > 0 && (
                 <div>
                   <h4 className="font-medium mb-3 flex items-center gap-2">
@@ -390,7 +403,7 @@ export function ATSScore({ cvData, language = "en" }: ATSScoreProps) {
                     {t.categories}
                   </h4>
                   <div className="space-y-3">
-                    {Object.entries(atsAnalysis.categories)
+                    {Object.entries(atsAnalysis.categories || {})
                       .slice(0, 4)
                       .map(([category, data]) => (
                         <div

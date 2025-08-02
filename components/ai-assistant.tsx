@@ -434,7 +434,7 @@ export function AIAssistant({ cvData, language = "en" }: AIAssistantProps) {
                       {t.categories}
                     </h4>
                     <div className="grid grid-cols-1 gap-3">
-                      {Object.entries(atsAnalysis.categories).map(
+                      {Object.entries(atsAnalysis.categories || {}).map(
                         ([category, data]) => (
                           <div
                             key={category}
