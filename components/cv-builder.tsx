@@ -11,7 +11,7 @@ import { SkillsForm } from "./skills-form";
 import { CustomSectionForm } from "./custom-section-form";
 import { CVPreview } from "./cv-preview";
 import { ATSScore } from "./ats-score";
-import { EnhancedAIAssistantStatic } from "./enhanced-ai-assistant-static";
+import { AIAssistant } from "./ai-assistant";
 import { ThemeCustomizer } from "./theme-customizer";
 import { SaveStatus } from "./save-status";
 import { Eye, Sparkles } from "lucide-react";
@@ -486,11 +486,7 @@ export function CVBuilder() {
 
         {showAI && (
           <div className="lg:sticky lg:top-4">
-            <EnhancedAIAssistantStatic
-              cvData={cvData}
-              language={language}
-              onApplySuggestion={handleApplySuggestion}
-            />
+            <AIAssistant cvData={cvData} language={language} />
           </div>
         )}
       </div>

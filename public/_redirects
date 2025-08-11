@@ -3,8 +3,5 @@
 /cv-builder / 301
 /resume-builder / 301
 
-# API routes for Netlify Functions
-/api/* /.netlify/functions/:splat 200
-
-# Fallback for client-side routing
-/* /index.html 200
+# Note: Next.js routing is handled by @netlify/plugin-nextjs.
+# Do not add catch-all API or SPA fallbacks here, they break SSR/API routes.

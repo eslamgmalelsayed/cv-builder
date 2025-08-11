@@ -1,15 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for GitHub Pages
-  output: "export",
+  // Netlify SSR build (no static export)
+  // Do NOT set output: "export" here — it breaks API routes on Netlify
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
 
-  // GitHub Pages settings
-  basePath: process.env.NODE_ENV === 'production' ? '/cv-builder' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/cv-builder/' : '',
-
-  // Image optimization - must be disabled for static export
+  // Image optimization
   images: {
     unoptimized: true,
     domains: ["fonts.googleapis.com", "fonts.gstatic.com"],
