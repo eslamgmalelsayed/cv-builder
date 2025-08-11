@@ -90,11 +90,10 @@
   settings = true
 
 # Function-level overrides (ensure Next API route bundle includes chromium files)
-[[functions]]
-  name = "next_api_generate-pdf"
+[functions."next_api_generate-pdf"]
   external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
   included_files = [
-  "node_modules/@sparticuz/chromium/**",
+    "node_modules/@sparticuz/chromium/**",
     "node_modules/@sparticuz/chromium/bin/**",
     "node_modules/@sparticuz/chromium/*.json"
   ]
