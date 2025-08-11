@@ -26,24 +26,29 @@ export async function POST(request: NextRequest) {
       if (isServerless) {
         const { default: chromium } = await import("@sparticuz/chromium");
         const { default: puppeteerCore } = await import("puppeteer-core");
-        let executablePath = await chromium.executablePath();
-        try {
-          if (!executablePath || !fs.existsSync(executablePath)) {
-            const fallbacks = [
-              "/var/task/node_modules/@sparticuz/chromium/bin/chromium",
-              "/var/task/.netlify/functions/node_modules/@sparticuz/chromium/bin/chromium",
-              "/var/task/.netlify/functions-internal/node_modules/@sparticuz/chromium/bin/chromium",
-            ];
-            const found = fallbacks.find((p) => {
-              try {
-                return fs.existsSync(p);
-              } catch {
-                return false;
-              }
-            });
-            if (found) executablePath = found;
+        const attemptedPaths: string[] = [];
+        let executablePath = "";
+        const fallbacks = [
+          "/var/task/node_modules/@sparticuz/chromium/bin/chromium",
+          "/var/task/.netlify/functions/node_modules/@sparticuz/chromium/bin/chromium",
+          "/var/task/.netlify/functions-internal/node_modules/@sparticuz/chromium/bin/chromium",
+        ];
+        for (const p of fallbacks) {
+          attemptedPaths.push(p);
+          try {
+            if (fs.existsSync(p)) {
+              executablePath = p;
+              break;
+            }
+          } catch (err) {
+            attemptedPaths.push(`Error checking ${p}: ${err}`);
           }
-        } catch {}
+        }
+        if (!executablePath) {
+          throw new Error(
+            `No Chromium binary found. Attempted: ${attemptedPaths.join(", ")}`
+          );
+        }
         browser = await puppeteerCore.launch({
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,
