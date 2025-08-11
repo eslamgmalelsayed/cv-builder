@@ -172,12 +172,29 @@ exports.handler = async (event, context) => {
       throw new Error("No analysis received from AI");
     }
 
-    // Try to parse as JSON, fallback to text
+    // Try to extract/parse JSON even if wrapped with text or code fences
     let analysis;
-    try {
-      analysis = JSON.parse(analysisText);
-    } catch {
-      // If not valid JSON, create structured response
+    const fenceMatch = analysisText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    const candidate = fenceMatch ? fenceMatch[1] : analysisText;
+
+    const tryParsers = [
+      () => JSON.parse(candidate),
+      () => {
+        const objMatch = analysisText.match(/\{[\s\S]*\}/);
+        if (objMatch) return JSON.parse(objMatch[0]);
+        throw new Error("No JSON object found");
+      },
+    ];
+
+    for (const parseFn of tryParsers) {
+      try {
+        analysis = parseFn();
+        break;
+      } catch {}
+    }
+
+    if (!analysis || typeof analysis !== "object") {
+      // Fallback structured response if parsing failed
       analysis = {
         score: 75,
         feedback: analysisText,
