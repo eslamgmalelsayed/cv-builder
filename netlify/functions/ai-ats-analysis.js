@@ -1,30 +1,30 @@
-const https = require('https');
+const https = require("https");
 
 // Helper function to make HTTPS requests
 function makeHttpsRequest(options, data) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
+      let body = "";
+      res.on("data", (chunk) => (body += chunk));
+      res.on("end", () => {
         try {
           resolve({
             ok: res.statusCode >= 200 && res.statusCode < 300,
             status: res.statusCode,
-            data: JSON.parse(body)
+            data: JSON.parse(body),
           });
         } catch (error) {
           reject(new Error(`Failed to parse response: ${error.message}`));
         }
       });
     });
-    
-    req.on('error', reject);
-    
+
+    req.on("error", reject);
+
     if (data) {
       req.write(data);
     }
-    
+
     req.end();
   });
 }
@@ -91,26 +91,26 @@ Focus on:
 
 exports.handler = async (event, context) => {
   // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
       },
-      body: '',
+      body: "",
     };
   }
 
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
@@ -121,8 +121,8 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({ error: "GROQ API key not configured" }),
       };
@@ -149,15 +149,15 @@ exports.handler = async (event, context) => {
     });
 
     const options = {
-      hostname: 'api.groq.com',
+      hostname: "api.groq.com",
       port: 443,
-      path: '/openai/v1/chat/completions',
-      method: 'POST',
+      path: "/openai/v1/chat/completions",
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(requestData)
-      }
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(requestData),
+      },
     };
 
     const response = await makeHttpsRequest(options, requestData);
@@ -188,17 +188,38 @@ exports.handler = async (event, context) => {
           },
         ],
         strengths: ["CV analysis completed"],
-        improvements: ["See detailed feedback above"]
+        improvements: ["See detailed feedback above"],
       };
     }
+
+    // Add aliases to match UI expectations
+    const responseBody = {
+      ...analysis,
+      atsScore:
+        typeof analysis.atsScore === "number"
+          ? analysis.atsScore
+          : typeof analysis.score === "number"
+          ? analysis.score
+          : 0,
+      overallFeedback:
+        typeof analysis.overallFeedback === "string"
+          ? analysis.overallFeedback
+          : typeof analysis.feedback === "string"
+          ? analysis.feedback
+          : "",
+      categories: analysis.categories || {},
+      prioritySuggestions: analysis.prioritySuggestions || [],
+      missingElements: analysis.missingElements || analysis.improvements || [],
+      strengths: analysis.strengths || [],
+    };
 
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(analysis),
+      body: JSON.stringify(responseBody),
     };
   } catch (error) {
     console.error("Error in ATS analysis:", error);
@@ -206,13 +227,15 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({
-        error: error.message || (language === "ar" 
-          ? "حدث خطأ في تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى."
-          : "An error occurred while analyzing your CV. Please try again."),
+        error:
+          error.message ||
+          (language === "ar"
+            ? "حدث خطأ في تحليل السيرة الذاتية. يرجى المحاولة مرة أخرى."
+            : "An error occurred while analyzing your CV. Please try again."),
       }),
     };
   }

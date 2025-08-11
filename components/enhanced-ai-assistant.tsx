@@ -165,8 +165,21 @@ export function EnhancedAIAssistant({
         throw new Error(`ATS analysis failed: ${atsResponse.status}`);
       }
 
-      const atsAnalysis = await atsResponse.json();
-      setAtsAnalysis(atsAnalysis);
+      const raw = await atsResponse.json();
+      const normalized: ATSAnalysis = {
+        atsScore: Number((raw?.atsScore ?? raw?.score ?? 0) as number) || 0,
+        overallFeedback: (raw?.overallFeedback ??
+          raw?.feedback ??
+          "") as string,
+        categories: (raw?.categories ?? {}) as ATSAnalysis["categories"],
+        prioritySuggestions: (raw?.prioritySuggestions ??
+          []) as ATSAnalysis["prioritySuggestions"],
+        missingElements: (raw?.missingElements ??
+          raw?.improvements ??
+          []) as string[],
+        strengths: (raw?.strengths ?? []) as string[],
+      };
+      setAtsAnalysis(normalized);
 
       // Then get detailed suggestions
       const suggestionsResponse = await fetch("/api/enhanced-ai-suggestions", {
