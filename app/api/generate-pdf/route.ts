@@ -52,6 +52,18 @@ export async function POST(request: NextRequest) {
         await page.emulateMediaType("screen");
       }
 
+      // Reduce external network chatter that can fail on serverless (fonts/images)
+      if (page.setRequestInterception) {
+        await page.setRequestInterception(true);
+        page.on("request", (req: any) => {
+          const type = req.resourceType?.() || "";
+          if (type === "font" || type === "image" || type === "media") {
+            return req.abort?.();
+          }
+          return req.continue?.();
+        });
+      }
+
       // Set the content (avoid waiting for all fonts to load indefinitely)
       await page.setContent(htmlWithBase, {
         waitUntil: "load",
@@ -92,8 +104,12 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error("Error generating PDF:", error);
+    const message =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate PDF" },
+      { error: "Failed to generate PDF", message },
       { status: 500 }
     );
   }
