@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import fs from "node:fs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -25,7 +26,24 @@ export async function POST(request: NextRequest) {
       if (isServerless) {
         const { default: chromium } = await import("@sparticuz/chromium");
         const { default: puppeteerCore } = await import("puppeteer-core");
-        const executablePath = await chromium.executablePath();
+        let executablePath = await chromium.executablePath();
+        try {
+          if (!executablePath || !fs.existsSync(executablePath)) {
+            const fallbacks = [
+              "/var/task/node_modules/@sparticuz/chromium/bin/chromium",
+              "/var/task/.netlify/functions/node_modules/@sparticuz/chromium/bin/chromium",
+              "/var/task/.netlify/functions-internal/node_modules/@sparticuz/chromium/bin/chromium",
+            ];
+            const found = fallbacks.find((p) => {
+              try {
+                return fs.existsSync(p);
+              } catch {
+                return false;
+              }
+            });
+            if (found) executablePath = found;
+          }
+        } catch {}
         browser = await puppeteerCore.launch({
           args: chromium.args,
           defaultViewport: chromium.defaultViewport,

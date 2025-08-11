@@ -10,6 +10,16 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+[functions]
+  # Ensure serverless bundle can locate Chromium binary and puppeteer-core at runtime
+  node_bundler = "esbuild"
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
+  included_files = [
+  "node_modules/@sparticuz/chromium/**",
+    "node_modules/@sparticuz/chromium/bin/**",
+    "node_modules/@sparticuz/chromium/*.json"
+  ]
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -78,3 +88,13 @@
 # Form handling (if needed for contact forms)
 [forms]
   settings = true
+
+# Function-level overrides (ensure Next API route bundle includes chromium files)
+[[functions]]
+  name = "next_api_generate-pdf"
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
+  included_files = [
+  "node_modules/@sparticuz/chromium/**",
+    "node_modules/@sparticuz/chromium/bin/**",
+    "node_modules/@sparticuz/chromium/*.json"
+  ]
