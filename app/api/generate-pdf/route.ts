@@ -1,21 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-// Force Netlify to bundle the Chromium binary
-import path from "path";
-import fs from "node:fs";
-
-const chromiumBinaryPath = path.resolve(
-  __dirname,
-  "../../../node_modules/@sparticuz/chromium/bin/chromium"
-);
-try {
-  // This does not need to be used, just referenced so Netlify bundles it
-  if (fs.existsSync(chromiumBinaryPath)) {
-    // Optionally log or touch the file
-    console.log("Chromium binary referenced for bundling:", chromiumBinaryPath);
-  }
-} catch (e) {
-  // Ignore errors
-}
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -33,56 +18,15 @@ export async function POST(request: NextRequest) {
       ? html
       : html.replace("<head>", `<head><base href="${origin}/">`);
 
-    // Decide environment: use @sparticuz/chromium + puppeteer-core on Netlify/serverless, otherwise fallback to puppeteer
-    const isServerless =
-      !!process.env.NETLIFY || !!process.env.AWS_EXECUTION_ENV;
-
+    // Always use puppeteer-core and @sparticuz/chromium for serverless (Vercel/Netlify)
     let browser: any;
     try {
-      if (isServerless) {
-        const { default: chromium } = await import("@sparticuz/chromium");
-        const { default: puppeteerCore } = await import("puppeteer-core");
-        const attemptedPaths: string[] = [];
-        let executablePath = "";
-        const fallbacks = [
-          "/var/task/node_modules/@sparticuz/chromium/bin/chromium",
-          "/var/task/.netlify/functions/node_modules/@sparticuz/chromium/bin/chromium",
-          "/var/task/.netlify/functions-internal/node_modules/@sparticuz/chromium/bin/chromium",
-        ];
-        for (const p of fallbacks) {
-          attemptedPaths.push(p);
-          try {
-            if (fs.existsSync(p)) {
-              executablePath = p;
-              break;
-            }
-          } catch (err) {
-            attemptedPaths.push(`Error checking ${p}: ${err}`);
-          }
-        }
-        if (!executablePath) {
-          throw new Error(
-            `No Chromium binary found. Attempted: ${attemptedPaths.join(", ")}`
-          );
-        }
-        browser = await puppeteerCore.launch({
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath,
-          headless: chromium.headless,
-        });
-      } else {
-        const { default: puppeteer } = await import("puppeteer");
-        browser = await puppeteer.launch({
-          headless: true,
-          args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-gpu",
-          ],
-        });
-      }
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
 
       const page = await (browser as any).newPage();
 
