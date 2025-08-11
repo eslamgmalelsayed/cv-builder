@@ -56,9 +56,30 @@ export async function POST(request: NextRequest) {
     const analysisText = data.choices?.[0]?.message?.content?.trim() || "";
 
     // Parse the AI response
-    const analysis = parseATSAnalysis(analysisText, language);
+    const raw = parseATSAnalysis(analysisText, language) as any;
 
-    return NextResponse.json(analysis);
+    // Normalize the response to a consistent shape expected by the UI
+    const normalized = {
+      ...raw,
+      atsScore:
+        typeof raw?.atsScore === "number"
+          ? raw.atsScore
+          : typeof raw?.score === "number"
+          ? raw.score
+          : 0,
+      overallFeedback:
+        typeof raw?.overallFeedback === "string"
+          ? raw.overallFeedback
+          : typeof raw?.feedback === "string"
+          ? raw.feedback
+          : "",
+      categories: raw?.categories ?? {},
+      prioritySuggestions: raw?.prioritySuggestions ?? [],
+      missingElements: raw?.missingElements ?? raw?.improvements ?? [],
+      strengths: raw?.strengths ?? [],
+    };
+
+    return NextResponse.json(normalized);
   } catch (error) {
     console.error("Error in ATS analysis API:", error);
     return NextResponse.json(
