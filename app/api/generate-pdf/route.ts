@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 // Force Netlify to bundle the Chromium binary
 import path from "path";
+import fs from "node:fs";
 
 const chromiumBinaryPath = path.resolve(
   __dirname,
@@ -15,7 +16,6 @@ try {
 } catch (e) {
   // Ignore errors
 }
-import fs from "node:fs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
