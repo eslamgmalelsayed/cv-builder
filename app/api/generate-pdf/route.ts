@@ -21,10 +21,44 @@ export async function POST(request: NextRequest) {
     // Always use puppeteer-core and @sparticuz/chromium for serverless (Vercel/Netlify)
     let browser: any;
     try {
+      // Workaround for Vercel deployment path issues
+      let executablePath;
+      try {
+        executablePath = await chromium.executablePath();
+      } catch (pathError) {
+        console.log(
+          "chromium.executablePath() failed, trying alternative paths"
+        );
+        // Fallback paths for different serverless environments
+        const alternativePaths = [
+          "/opt/chromium",
+          "/usr/bin/chromium-browser",
+          "/usr/bin/chromium",
+          "/usr/bin/google-chrome",
+          "/usr/bin/google-chrome-stable",
+        ];
+        for (const path of alternativePaths) {
+          try {
+            const fs = await import("fs");
+            if (fs.existsSync && fs.existsSync(path)) {
+              executablePath = path;
+              break;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        if (!executablePath) {
+          throw new Error(
+            `No Chromium binary found. Original error: ${pathError}`
+          );
+        }
+      }
+
       browser = await puppeteer.launch({
-        args: chromium.args,
+        args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
+        executablePath,
         headless: chromium.headless,
       });
 
