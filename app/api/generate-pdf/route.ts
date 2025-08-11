@@ -1,4 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+// Force Netlify to bundle the Chromium binary
+import path from "path";
+
+const chromiumBinaryPath = path.resolve(
+  __dirname,
+  "../../../node_modules/@sparticuz/chromium/bin/chromium"
+);
+try {
+  // This does not need to be used, just referenced so Netlify bundles it
+  if (fs.existsSync(chromiumBinaryPath)) {
+    // Optionally log or touch the file
+    console.log("Chromium binary referenced for bundling:", chromiumBinaryPath);
+  }
+} catch (e) {
+  // Ignore errors
+}
 import fs from "node:fs";
 
 export const runtime = "nodejs";
