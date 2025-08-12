@@ -7,65 +7,48 @@ export async function POST(request: NextRequest) {
   try {
     const { html, fileName } = await request.json();
 
-    // Check if running on serverless environment (more specific detection)
+    // Detect serverless environment more broadly
     const isServerless = !!(
-      process.env.NETLIFY ||
       process.env.VERCEL ||
+      process.env.NETLIFY ||
       process.env.AWS_EXECUTION_ENV ||
       process.env.AWS_LAMBDA_FUNCTION_NAME ||
-      (process.env.NODE_ENV === "production" &&
-        (process.env.NETLIFY || process.env.VERCEL))
+      process.env.NODE_ENV === "production"
     );
 
     console.log("Environment check:", {
       NETLIFY: !!process.env.NETLIFY,
       VERCEL: !!process.env.VERCEL,
       AWS_EXECUTION_ENV: !!process.env.AWS_EXECUTION_ENV,
-      AWS_LAMBDA_FUNCTION_NAME: !!process.env.AWS_LAMBDA_FUNCTION_NAME,
       NODE_ENV: process.env.NODE_ENV,
       isServerless,
     });
 
     let browser: any;
 
-    // Always use @sparticuz/chromium for serverless environments
     if (isServerless) {
-      console.log("Using @sparticuz/chromium for serverless environment");
-      try {
-        const { default: chromium } = await import("@sparticuz/chromium");
-        const { default: puppeteerCore } = await import("puppeteer-core");
+      // For serverless environments, always use @sparticuz/chromium - no fallback
+      console.log("Serverless detected, using @sparticuz/chromium");
+      const { default: chromium } = await import("@sparticuz/chromium");
+      const { default: puppeteerCore } = await import("puppeteer-core");
 
-        let executablePath;
-        try {
-          executablePath = await chromium.executablePath();
-          console.log("Chromium executable path:", executablePath);
-        } catch (pathError) {
-          console.error("Failed to get chromium executable path:", pathError);
-          throw new Error(`Chromium path error: ${pathError}`);
-        }
+      // Set chromium flags for better serverless compatibility
+      const args = [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--single-process',
+        '--no-zygote'
+      ];
 
-        browser = await puppeteerCore.launch({
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath,
-          headless: chromium.headless,
-        });
-      } catch (chromiumError) {
-        console.error(
-          "Chromium setup failed, falling back to regular puppeteer"
-        );
-        // Fallback to regular puppeteer if chromium fails
-        const { default: puppeteer } = await import("puppeteer");
-        browser = await puppeteer.launch({
-          headless: true,
-          args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-gpu",
-          ],
-        });
-      }
+      browser = await puppeteerCore.launch({
+        args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+      });
     } else {
       console.log("Using regular puppeteer for local development");
       const { default: puppeteer } = await import("puppeteer");
