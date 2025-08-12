@@ -25,54 +25,6 @@ export async function POST(request: NextRequest) {
       process.env.NODE_ENV === "production"
     );
 
-    // Prefer a remote Chrome service on serverless to avoid local binary issues
-    const browserlessToken = process.env.BROWSERLESS_TOKEN;
-    const browserlessHttpUrl = process.env.BROWSERLESS_HTTP_URL; // e.g. https://chrome.browserless.io/pdf?token=XXXX
-
-    if (isServerless && (browserlessToken || browserlessHttpUrl)) {
-      const endpoint =
-        browserlessHttpUrl ||
-        `https://chrome.browserless.io/pdf?token=${browserlessToken}`;
-      const payload = {
-        html: htmlWithBase,
-        options: {
-          format: "A4",
-          printBackground: true,
-          margin: { top: "8mm", right: "8mm", bottom: "8mm", left: "8mm" },
-          preferCSSPageSize: true,
-          displayHeaderFooter: false,
-        },
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-store",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`Remote PDF render failed (${res.status}): ${text}`);
-      }
-
-      const arrayBuf = await res.arrayBuffer();
-      const buffer = Buffer.from(arrayBuf);
-      return new NextResponse(buffer, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="${
-            fileName || "CV.pdf"
-          }"`,
-          "Cache-Control": "no-store",
-        },
-      });
-    }
-
-    // Fallbacks: Local dev (puppeteer) or serverless with @sparticuz/chromium if available
     if (isServerless) {
       const { default: chromium } = await import("@sparticuz/chromium");
       const { default: puppeteerCore } = await import("puppeteer-core");
@@ -170,9 +122,6 @@ export async function POST(request: NextRequest) {
           NETLIFY: !!process.env.NETLIFY,
           VERCEL: !!process.env.VERCEL,
           NODE_ENV: process.env.NODE_ENV,
-          usedRemote: !!(
-            process.env.BROWSERLESS_TOKEN || process.env.BROWSERLESS_HTTP_URL
-          ),
         },
       },
       { status: 500 }
