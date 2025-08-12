@@ -27,40 +27,41 @@ export async function POST(request: NextRequest) {
     let browser: any;
 
     if (isServerless) {
-      // For serverless environments, always use @sparticuz/chromium
-      console.log("Serverless detected, using @sparticuz/chromium");
-      const { default: chromium } = await import("@sparticuz/chromium");
+      // For serverless environments, prefer a remote Chrome (Browserless) if configured
       const { default: puppeteerCore } = await import("puppeteer-core");
+      const wsEndpoint =
+        process.env.BROWSERLESS_WS_URL ||
+        process.env.PUPPETEER_WS_ENDPOINT ||
+        process.env.CHROME_WS_ENDPOINT ||
+        "";
 
-      // Try to get executable path with error handling
-      let executablePath;
-      try {
-        executablePath = await chromium.executablePath();
-        console.log("Chromium executable path:", executablePath);
-      } catch (pathError) {
-        console.error("chromium.executablePath() failed:", pathError);
-        // Last resort - try to use a hardcoded path that might work on Vercel
-        executablePath = "/opt/chromium";
-        console.log("Using hardcoded chromium path:", executablePath);
+      if (wsEndpoint) {
+        console.log("Connecting to remote Chrome via WS endpoint");
+        browser = await puppeteerCore.connect({
+          browserWSEndpoint: wsEndpoint,
+        });
+      } else {
+        console.log(
+          "Serverless detected, using @sparticuz/chromium local binary"
+        );
+        const { default: chromium } = await import("@sparticuz/chromium");
+        const executablePath = await chromium.executablePath();
+        const args = [
+          ...chromium.args,
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--single-process",
+          "--no-zygote",
+        ];
+        browser = await puppeteerCore.launch({
+          args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath,
+          headless: chromium.headless,
+        });
       }
-
-      // Set chromium flags for better serverless compatibility
-      const args = [
-        ...chromium.args,
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--single-process",
-        "--no-zygote",
-      ];
-
-      browser = await puppeteerCore.launch({
-        args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath,
-        headless: chromium.headless,
-      });
     } else {
       console.log("Using regular puppeteer for local development");
       const { default: puppeteer } = await import("puppeteer");
@@ -120,6 +121,13 @@ export async function POST(request: NextRequest) {
           NETLIFY: !!process.env.NETLIFY,
           VERCEL: !!process.env.VERCEL,
           NODE_ENV: process.env.NODE_ENV,
+        },
+        hints: {
+          usedRemoteWS: !!(
+            process.env.BROWSERLESS_WS_URL ||
+            process.env.PUPPETEER_WS_ENDPOINT ||
+            process.env.CHROME_WS_ENDPOINT
+          ),
         },
       },
       { status: 500 }
