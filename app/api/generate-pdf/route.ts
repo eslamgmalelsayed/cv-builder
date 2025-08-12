@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-core";
+import fs from "node:fs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -18,49 +17,56 @@ export async function POST(request: NextRequest) {
       ? html
       : html.replace("<head>", `<head><base href="${origin}/">`);
 
-    // Always use puppeteer-core and @sparticuz/chromium for serverless (Vercel/Netlify)
+    // Decide environment: use @sparticuz/chromium + puppeteer-core on Netlify/serverless, otherwise fallback to puppeteer
+    const isServerless =
+      !!process.env.NETLIFY || !!process.env.AWS_EXECUTION_ENV;
+
     let browser: any;
     try {
-      // Workaround for Vercel deployment path issues
-      let executablePath;
-      try {
-        executablePath = await chromium.executablePath();
-      } catch (pathError) {
-        console.log(
-          "chromium.executablePath() failed, trying alternative paths"
-        );
-        // Fallback paths for different serverless environments
-        const alternativePaths = [
-          "/opt/chromium",
-          "/usr/bin/chromium-browser",
-          "/usr/bin/chromium",
-          "/usr/bin/google-chrome",
-          "/usr/bin/google-chrome-stable",
+      if (isServerless) {
+        const { default: chromium } = await import("@sparticuz/chromium");
+        const { default: puppeteerCore } = await import("puppeteer-core");
+        const attemptedPaths: string[] = [];
+        let executablePath = "";
+        const fallbacks = [
+          "/var/task/node_modules/@sparticuz/chromium/bin/chromium",
+          "/var/task/.netlify/functions/node_modules/@sparticuz/chromium/bin/chromium",
+          "/var/task/.netlify/functions-internal/node_modules/@sparticuz/chromium/bin/chromium",
         ];
-        for (const path of alternativePaths) {
+        for (const p of fallbacks) {
+          attemptedPaths.push(p);
           try {
-            const fs = await import("fs");
-            if (fs.existsSync && fs.existsSync(path)) {
-              executablePath = path;
+            if (fs.existsSync(p)) {
+              executablePath = p;
               break;
             }
-          } catch (e) {
-            continue;
+          } catch (err) {
+            attemptedPaths.push(`Error checking ${p}: ${err}`);
           }
         }
         if (!executablePath) {
           throw new Error(
-            `No Chromium binary found. Original error: ${pathError}`
+            `No Chromium binary found. Attempted: ${attemptedPaths.join(", ")}`
           );
         }
+        browser = await puppeteerCore.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath,
+          headless: chromium.headless,
+        });
+      } else {
+        const { default: puppeteer } = await import("puppeteer");
+        browser = await puppeteer.launch({
+          headless: true,
+          args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+          ],
+        });
       }
-
-      browser = await puppeteer.launch({
-        args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
-        defaultViewport: chromium.defaultViewport,
-        executablePath,
-        headless: chromium.headless,
-      });
 
       const page = await (browser as any).newPage();
 
