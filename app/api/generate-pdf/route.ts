@@ -7,14 +7,27 @@ export async function POST(request: NextRequest) {
   try {
     const { html, fileName } = await request.json();
 
-    // Check if running on Netlify/serverless environment
-    const isNetlify = !!process.env.NETLIFY;
+    // Check if running on serverless environment (Netlify, Vercel, etc.)
+    const isServerless = !!(
+      process.env.NETLIFY ||
+      process.env.VERCEL ||
+      process.env.AWS_EXECUTION_ENV ||
+      process.env.NODE_ENV === "production"
+    );
+
+    console.log("Environment check:", {
+      NETLIFY: !!process.env.NETLIFY,
+      VERCEL: !!process.env.VERCEL,
+      AWS_EXECUTION_ENV: !!process.env.AWS_EXECUTION_ENV,
+      NODE_ENV: process.env.NODE_ENV,
+      isServerless,
+    });
 
     let browser: any;
 
-    if (isNetlify) {
-      // Use @sparticuz/chromium for Netlify
-      console.log("Running on Netlify, using @sparticuz/chromium");
+    // Always use @sparticuz/chromium for serverless environments
+    if (isServerless) {
+      console.log("Using @sparticuz/chromium for serverless environment");
       const { default: chromium } = await import("@sparticuz/chromium");
       const { default: puppeteerCore } = await import("puppeteer-core");
 
@@ -28,7 +41,7 @@ export async function POST(request: NextRequest) {
         headless: chromium.headless,
       });
     } else {
-      // Use regular puppeteer for local development
+      console.log("Using regular puppeteer for local development");
       const { default: puppeteer } = await import("puppeteer");
       browser = await puppeteer.launch({
         headless: true,
@@ -82,7 +95,11 @@ export async function POST(request: NextRequest) {
       {
         error: "Failed to generate PDF",
         message: errorMessage,
-        environment: process.env.NETLIFY ? "netlify" : "local",
+        environment: {
+          NETLIFY: !!process.env.NETLIFY,
+          VERCEL: !!process.env.VERCEL,
+          NODE_ENV: process.env.NODE_ENV,
+        },
       },
       { status: 500 }
     );
