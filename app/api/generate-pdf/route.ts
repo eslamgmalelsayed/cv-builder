@@ -14,13 +14,17 @@ export async function POST(request: NextRequest) {
 
     if (isNetlify) {
       // Use @sparticuz/chromium for Netlify
+      console.log("Running on Netlify, using @sparticuz/chromium");
       const { default: chromium } = await import("@sparticuz/chromium");
       const { default: puppeteerCore } = await import("puppeteer-core");
+
+      const executablePath = await chromium.executablePath();
+      console.log("Chromium executable path:", executablePath);
 
       browser = await puppeteerCore.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
+        executablePath,
         headless: chromium.headless,
       });
     } else {
@@ -72,8 +76,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error generating PDF:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate PDF" },
+      {
+        error: "Failed to generate PDF",
+        message: errorMessage,
+        environment: process.env.NETLIFY ? "netlify" : "local",
+      },
       { status: 500 }
     );
   }
