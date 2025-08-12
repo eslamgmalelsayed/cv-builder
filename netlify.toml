@@ -13,12 +13,7 @@
 [functions]
   # Ensure serverless bundle can locate Chromium binary and puppeteer-core at runtime
   node_bundler = "esbuild"
-  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
-  included_files = [
-  "node_modules/@sparticuz/chromium/**",
-    "node_modules/@sparticuz/chromium/bin/**",
-    "node_modules/@sparticuz/chromium/*.json"
-  ]
+  external_node_modules = ["chrome-aws-lambda", "puppeteer-core"]
 
 [[headers]]
   for = "/*"
@@ -91,9 +86,4 @@
 
 # Function-level overrides (ensure Next API route bundle includes chromium files)
 [functions."next_api_generate-pdf"]
-  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
-  included_files = [
-    "node_modules/@sparticuz/chromium/**",
-    "node_modules/@sparticuz/chromium/bin/**",
-    "node_modules/@sparticuz/chromium/*.json"
-  ]
+  external_node_modules = ["chrome-aws-lambda", "puppeteer-core"]

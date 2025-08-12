@@ -26,10 +26,10 @@ export async function POST(request: NextRequest) {
     );
 
     if (isServerless) {
-      const { default: chromium } = await import("@sparticuz/chromium");
+      const { default: chromium } = await import("chrome-aws-lambda");
       const { default: puppeteerCore } = await import("puppeteer-core");
 
-      const executablePath = await chromium.executablePath();
+      const executablePath = await chromium.executablePath;
       const args = [
         ...chromium.args,
         "--no-sandbox",
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
       try {
         const page = await browser.newPage();
-        await page.setContent(htmlWithBase, { waitUntil: "load" });
+  await page.setContent(htmlWithBase, { waitUntil: "networkidle0" });
         const pdf = await page.pdf({
           format: "A4",
           printBackground: true,
