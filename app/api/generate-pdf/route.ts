@@ -7,7 +7,16 @@ export async function POST(request: NextRequest) {
   try {
     const { html, fileName } = await request.json();
 
-    // Detect serverless environment more broadly
+    // Ensure absolute origins for assets referenced in the HTML (fonts, images, css)
+    const origin =
+      request.nextUrl?.origin ||
+      request.headers.get("origin") ||
+      "https://cvifi.netlify.app";
+    const htmlWithBase = html?.includes("<base ")
+      ? html
+      : html?.replace("<head>", `<head><base href="${origin}/">`);
+
+    // Detect serverless environment (Vercel/Netlify/AWS)
     const isServerless = !!(
       process.env.VERCEL ||
       process.env.NETLIFY ||
@@ -16,56 +25,105 @@ export async function POST(request: NextRequest) {
       process.env.NODE_ENV === "production"
     );
 
-    console.log("Environment check:", {
-      NETLIFY: !!process.env.NETLIFY,
-      VERCEL: !!process.env.VERCEL,
-      AWS_EXECUTION_ENV: !!process.env.AWS_EXECUTION_ENV,
-      NODE_ENV: process.env.NODE_ENV,
-      isServerless,
-    });
+    // Prefer a remote Chrome service on serverless to avoid local binary issues
+    const browserlessToken = process.env.BROWSERLESS_TOKEN;
+    const browserlessHttpUrl = process.env.BROWSERLESS_HTTP_URL; // e.g. https://chrome.browserless.io/pdf?token=XXXX
 
-    let browser: any;
+    if (isServerless && (browserlessToken || browserlessHttpUrl)) {
+      const endpoint =
+        browserlessHttpUrl ||
+        `https://chrome.browserless.io/pdf?token=${browserlessToken}`;
+      const payload = {
+        html: htmlWithBase,
+        options: {
+          format: "A4",
+          printBackground: true,
+          margin: { top: "8mm", right: "8mm", bottom: "8mm", left: "8mm" },
+          preferCSSPageSize: true,
+          displayHeaderFooter: false,
+        },
+      };
 
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Remote PDF render failed (${res.status}): ${text}`);
+      }
+
+      const arrayBuf = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuf);
+      return new NextResponse(buffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${
+            fileName || "CV.pdf"
+          }"`,
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    // Fallbacks: Local dev (puppeteer) or serverless with @sparticuz/chromium if available
     if (isServerless) {
-      // For serverless environments, prefer a remote Chrome (Browserless) if configured
+      const { default: chromium } = await import("@sparticuz/chromium");
       const { default: puppeteerCore } = await import("puppeteer-core");
-      const wsEndpoint =
-        process.env.BROWSERLESS_WS_URL ||
-        process.env.PUPPETEER_WS_ENDPOINT ||
-        process.env.CHROME_WS_ENDPOINT ||
-        "";
 
-      if (wsEndpoint) {
-        console.log("Connecting to remote Chrome via WS endpoint");
-        browser = await puppeteerCore.connect({
-          browserWSEndpoint: wsEndpoint,
+      const executablePath = await chromium.executablePath();
+      const args = [
+        ...chromium.args,
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--single-process",
+        "--no-zygote",
+      ];
+
+      const browser = await puppeteerCore.launch({
+        args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath,
+        headless: chromium.headless,
+      });
+
+      try {
+        const page = await browser.newPage();
+        await page.setContent(htmlWithBase, { waitUntil: "load" });
+        const pdf = await page.pdf({
+          format: "A4",
+          printBackground: true,
+          margin: { top: "8mm", right: "8mm", bottom: "8mm", left: "8mm" },
+          displayHeaderFooter: false,
+          preferCSSPageSize: true,
+          tagged: false,
+          outline: false,
         });
-      } else {
-        console.log(
-          "Serverless detected, using @sparticuz/chromium local binary"
-        );
-        const { default: chromium } = await import("@sparticuz/chromium");
-        const executablePath = await chromium.executablePath();
-        const args = [
-          ...chromium.args,
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-          "--single-process",
-          "--no-zygote",
-        ];
-        browser = await puppeteerCore.launch({
-          args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath,
-          headless: chromium.headless,
+        return new NextResponse(pdf as BlobPart, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="${
+              fileName || "CV.pdf"
+            }"`,
+          },
         });
+      } finally {
+        try {
+          await browser.close();
+        } catch {}
       }
     } else {
-      console.log("Using regular puppeteer for local development");
       const { default: puppeteer } = await import("puppeteer");
-      browser = await puppeteer.launch({
+      const browser = await puppeteer.launch({
         headless: true,
         args: [
           "--no-sandbox",
@@ -74,59 +132,46 @@ export async function POST(request: NextRequest) {
           "--disable-gpu",
         ],
       });
+      try {
+        const page = await browser.newPage();
+        await page.setContent(htmlWithBase, { waitUntil: "networkidle0" });
+        const pdf = await page.pdf({
+          format: "A4",
+          printBackground: true,
+          margin: { top: "8mm", right: "8mm", bottom: "8mm", left: "8mm" },
+          displayHeaderFooter: false,
+          preferCSSPageSize: true,
+          tagged: false,
+          outline: false,
+        });
+        return new NextResponse(pdf as BlobPart, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="${
+              fileName || "CV.pdf"
+            }"`,
+          },
+        });
+      } finally {
+        try {
+          await browser.close();
+        } catch {}
+      }
     }
-
-    const page = await browser.newPage();
-
-    // Set the content
-    await page.setContent(html, {
-      waitUntil: "networkidle0",
-    });
-
-    // Generate PDF
-    const pdf = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      margin: {
-        top: "8mm",
-        right: "8mm",
-        bottom: "8mm",
-        left: "8mm",
-      },
-      displayHeaderFooter: false,
-      preferCSSPageSize: true,
-      tagged: false,
-      outline: false,
-    });
-
-    await browser.close();
-
-    // Return PDF as response
-    return new NextResponse(pdf as BlobPart, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${fileName || "CV.pdf"}"`,
-      },
-    });
   } catch (error) {
     console.error("Error generating PDF:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         error: "Failed to generate PDF",
-        message: errorMessage,
+        message,
         environment: {
           NETLIFY: !!process.env.NETLIFY,
           VERCEL: !!process.env.VERCEL,
           NODE_ENV: process.env.NODE_ENV,
-        },
-        hints: {
-          usedRemoteWS: !!(
-            process.env.BROWSERLESS_WS_URL ||
-            process.env.PUPPETEER_WS_ENDPOINT ||
-            process.env.CHROME_WS_ENDPOINT
+          usedRemote: !!(
+            process.env.BROWSERLESS_TOKEN || process.env.BROWSERLESS_HTTP_URL
           ),
         },
       },
