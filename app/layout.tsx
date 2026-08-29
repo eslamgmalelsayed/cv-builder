@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Cairo } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { LanguageProvider, SharedHeader } from "@/components/shared-header";
 import { BodyWrapper } from "@/components/body-wrapper";
 import "./globals.css";
 import "../styles/rtl.css";
 
-const inter = Inter({ subsets: ["latin"] });
-const cairo = Cairo({
+// English: IBM Plex Sans. The CSS variable is named --font-inter to stay
+// compatible with existing globals.css/rtl.css references (previously undefined,
+// which silently fell back to Arial).
+const inter = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+// Arabic: IBM Plex Sans Arabic — the cohesive sibling of IBM Plex Sans.
+// Variable named --font-cairo to keep existing references working.
+const cairo = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-cairo",
   display: "swap",
 });
@@ -108,12 +118,8 @@ export default function RootLayout({
         <meta name="theme-color" content="#3B82F6" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {/* Preload Cairo font for better performance */}
-        <link
-          rel="preload"
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap"
-          as="style"
-        />
+        {/* Fonts are optimized and self-hosted by next/font (IBM Plex Sans +
+            IBM Plex Sans Arabic) — no manual font <link> needed. */}
 
         {/* Structured Data */}
         <script
@@ -201,10 +207,11 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${cairo.variable}`}>
+      <body className={`${inter.className} ${inter.variable} ${cairo.variable}`}>
         <LanguageProvider>
           <BodyWrapper
             interClassName={inter.className}
+            interVariable={inter.variable}
             cairoVariable={cairo.variable}
           >
             <SharedHeader />

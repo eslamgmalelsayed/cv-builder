@@ -105,7 +105,7 @@ export default function JobsFinderPage() {
     >
       {/* Page Header */}
       <section className="py-8 bg-background border-b">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">
               {content.jobs.header.title}
@@ -131,7 +131,7 @@ export default function JobsFinderPage() {
           <div />
         </WarpBackground>
 
-        <div className="relative z-10 container mx-auto px-4 py-20 text-center">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="space-y-8 text-center">
             {/* Coming Soon Badge */}
             <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-full text-sm font-medium">
@@ -259,7 +259,7 @@ export default function JobsFinderPage() {
 
       {/* Mock Jobs Section (Preview) */}
       <section className="py-20 bg-muted/50">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               {content.jobs.preview.title}

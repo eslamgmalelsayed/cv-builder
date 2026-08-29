@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GROQ_CHAT_URL, GROQ_MODEL } from "@/lib/groq";
+import { enforceAiRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
     const { cvData, language = "en" } = await request.json();
+
+    const limited = enforceAiRateLimit(request, "heavy", language);
+    if (limited) return limited;
 
     if (!process.env.GROQ_API_KEY) {
       return NextResponse.json(
@@ -16,32 +21,31 @@ export async function POST(request: NextRequest) {
     // Create comprehensive CV analysis prompt
     const prompt = createATSAnalysisPrompt(cvData, language);
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are an expert ATS (Applicant Tracking System) analyzer and CV optimization specialist. Analyze CVs and provide detailed scoring and improvement suggestions. Always respond with valid JSON format.",
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          max_tokens: 2000,
-          temperature: 0.2,
-        }),
-      }
-    );
+    const response = await fetch(GROQ_CHAT_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert ATS (Applicant Tracking System) analyzer and CV optimization specialist. Analyze CVs and provide detailed scoring and improvement suggestions. Always respond with valid JSON format.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        max_tokens: 1200,
+        temperature: 0.2,
+        reasoning_effort: "low",
+        response_format: { type: "json_object" },
+      }),
+    });
 
     if (!response.ok) {
       const errorData = await response.text();
@@ -73,9 +77,22 @@ export async function POST(request: NextRequest) {
           : typeof raw?.feedback === "string"
           ? raw.feedback
           : "",
-      categories: raw?.categories ?? {},
+      // Keep only well-formed score categories — models sometimes nest arrays
+      // like missingElements/improvementNotes inside `categories`, which the UI
+      // would otherwise render as empty tiles.
+      categories: Object.fromEntries(
+        Object.entries(raw?.categories ?? {}).filter(
+          ([, v]) => v && typeof v === "object" && typeof (v as any).score === "number"
+        )
+      ),
       prioritySuggestions: raw?.prioritySuggestions ?? [],
-      missingElements: raw?.missingElements ?? raw?.improvements ?? [],
+      missingElements:
+        raw?.missingElements ??
+        raw?.categories?.missingElements ??
+        raw?.improvements ??
+        [],
+      improvementNotes:
+        raw?.improvementNotes ?? raw?.categories?.improvementNotes ?? [],
       strengths: raw?.strengths ?? [],
     };
 

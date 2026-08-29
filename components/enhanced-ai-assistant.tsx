@@ -162,6 +162,14 @@ export function EnhancedAIAssistant({
       });
 
       if (!atsResponse.ok) {
+        const errData = await atsResponse.json().catch(() => ({}));
+        if (atsResponse.status === 429 && errData?.error) {
+          showAlert(
+            language === "ar" ? "تم بلوغ الحد" : "Limit reached",
+            errData.error
+          );
+          return;
+        }
         throw new Error(`ATS analysis failed: ${atsResponse.status}`);
       }
 
@@ -194,6 +202,14 @@ export function EnhancedAIAssistant({
       });
 
       if (!suggestionsResponse.ok) {
+        const errData = await suggestionsResponse.json().catch(() => ({}));
+        if (suggestionsResponse.status === 429 && errData?.error) {
+          showAlert(
+            language === "ar" ? "تم بلوغ الحد" : "Limit reached",
+            errData.error
+          );
+          return;
+        }
         throw new Error(`Suggestions failed: ${suggestionsResponse.status}`);
       }
 

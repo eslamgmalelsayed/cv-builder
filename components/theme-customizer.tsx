@@ -129,7 +129,7 @@ export function ThemeCustomizer({
   const t = translations[currentLanguage];
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+    <div className="flex flex-col items-start gap-2 w-full sm:!flex-row sm:items-center sm:w-auto">
       {/* Color Theme Selector */}
       <Popover>
         <PopoverTrigger asChild>

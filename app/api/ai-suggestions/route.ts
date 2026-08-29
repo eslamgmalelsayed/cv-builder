@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { generateObject } from "ai";
 import { groq } from "@ai-sdk/groq";
 import { z } from "zod";
+import { GROQ_MODEL } from "@/lib/groq";
 
 export const runtime = "nodejs";
 
@@ -158,7 +159,7 @@ Please return your response in the following JSON format:
     const prompt = basePrompt + responseFormat;
 
     const result = await generateObject({
-      model: groq("llama-3.1-8b-instant"),
+      model: groq(GROQ_MODEL),
       schema: SuggestionSchema,
       prompt,
       temperature: 0.7,

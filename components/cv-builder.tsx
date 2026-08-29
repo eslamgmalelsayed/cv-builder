@@ -158,6 +158,14 @@ export function CVBuilder() {
     }
   }, [currentLanguage, language, isLoaded, updateLanguage]);
 
+  // Keep text direction tied to the language so the page/nav never end up in a
+  // mismatched state (e.g. Arabic content with an LTR nav). Arabic → RTL.
+  useEffect(() => {
+    if (!isLoaded) return;
+    const wanted = language === "ar" ? "rtl" : "ltr";
+    if (direction !== wanted) updateDirection(wanted);
+  }, [isLoaded, language, direction, updateDirection]);
+
   // Apply theme and language settings on load and when clearTrigger changes
   useEffect(() => {
     if (!isLoaded) return;
@@ -273,28 +281,16 @@ export function CVBuilder() {
   }
 
   return (
-    <div
-      className={`container mx-auto p-4 max-w-7xl xl:max-w-[1400px] 2xl:max-w-[1600px] ${
-        direction === "rtl" ? "text-start" : ""
-      }`}
-    >
+    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4 text-start">
       <div className="mb-6">
-        <div
-          className={`flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4 ${
-            direction === "rtl" ? "sm:flex-row-reverse" : ""
-          }`}
-        >
-          <div className={`${direction === "rtl" ? "text-start" : ""} flex-1`}>
+        <div className="flex flex-col gap-4 mb-4 sm:!flex-row sm:justify-between sm:items-start">
+          <div className="text-start flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {t.title}
             </h1>
             <p className="text-gray-600 text-sm sm:text-base">{t.subtitle}</p>
           </div>
-          <div
-            className={`flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto ${
-              direction === "rtl" ? "sm:flex-row-reverse" : ""
-            }`}
-          >
+          <div className="flex flex-col items-start gap-2 w-full sm:!flex-row sm:items-center sm:gap-4 sm:w-auto">
             <SaveStatus status={getSaveStatus()} language={language} />
             <ThemeCustomizer
               onDirectionChange={handleDirectionChange}
@@ -308,29 +304,34 @@ export function CVBuilder() {
         </div>
       </div>
 
-      <div
-        className={`grid grid-cols-1 sm:flex gap-2 sm:gap-4 mb-6 ${
-          direction === "rtl" ? "sm:flex-row-reverse" : ""
-        }`}
-      >
+      <div className="mb-6 flex flex-col gap-2 rounded-xl border bg-white p-2 shadow-sm sm:!flex-row sm:items-center">
         <Button
-          variant={showPreview ? "default" : "outline"}
+          variant={showPreview ? "default" : "ghost"}
           onClick={() => setShowPreview(!showPreview)}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          className="flex w-full items-center justify-center gap-2 sm:w-auto"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="h-4 w-4" />
           {showPreview ? t.hidePreview : t.showPreview}
         </Button>
         <Button
-          variant={showAI ? "default" : "outline"}
+          variant={showAI ? "default" : "ghost"}
           onClick={() => setShowAI(!showAI)}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          className="flex w-full items-center justify-center gap-2 sm:w-auto"
         >
-          <Sparkles className="w-4 h-4" />
+          <Sparkles className="h-4 w-4" />
           {t.atsScore}
         </Button>
+        <div className="hidden sm:block sm:flex-1" />
         <div className="w-full sm:w-auto">
-          <PDFExportButton cvData={cvData} language={language} />
+          <PDFExportButton
+            cvData={cvData}
+            language={language}
+            direction={direction}
+            themeColor={themeColor}
+            sectionOrder={sectionOrder}
+            visibleSections={visibleSections}
+            sectionNames={sectionNames}
+          />
         </div>
       </div>
 
@@ -479,6 +480,7 @@ export function CVBuilder() {
               sectionNames={sectionNames}
               direction={direction}
               language={language}
+              themeColor={themeColor}
               isPreviewMode={false}
             />
           </div>

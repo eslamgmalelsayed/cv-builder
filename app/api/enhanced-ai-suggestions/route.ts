@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { generateObject } from "ai";
-import { groq } from "@ai-sdk/groq";
 import { z } from "zod";
+import { GROQ_CHAT_URL, GROQ_MODEL } from "@/lib/groq";
+import { enforceAiRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -207,6 +207,9 @@ export async function POST(request: NextRequest) {
     } = await request.json();
     language = requestLanguage;
 
+    const limited = enforceAiRateLimit(request, "heavy", language);
+    if (limited) return limited;
+
     // Generate specific actionable suggestions
     const specificSuggestions = generateSpecificSuggestions(cvData, language);
 
@@ -321,17 +324,53 @@ Please return your response in the following JSON format:
 `;
 
     try {
-      const result = await generateObject({
-        model: groq("llama-3.3-70b-versatile"),
-        schema: EnhancedSuggestionSchema,
-        prompt: enhancedPrompt + responseFormat,
-        temperature: 0.7,
+      if (!process.env.GROQ_API_KEY) {
+        throw new Error("GROQ API key not configured");
+      }
+
+      // Raw chat completion with JSON mode. reasoning_effort:"low" keeps the
+      // gpt-oss reasoning from consuming the token budget before the JSON is
+      // complete (which previously truncated the object and dropped atsScore /
+      // overallFeedback, forcing the local-only fallback every time).
+      const response = await fetch(GROQ_CHAT_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are an expert ATS consultant. Always respond with a single valid JSON object matching the requested shape. No prose.",
+            },
+            { role: "user", content: enhancedPrompt + responseFormat },
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+          reasoning_effort: "low",
+          response_format: { type: "json_object" },
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Groq API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content ?? "{}";
+      const jsonMatch =
+        typeof content === "string" ? content.match(/\{[\s\S]*\}/) : null;
+      const parsed = EnhancedSuggestionSchema.parse(
+        JSON.parse(jsonMatch ? jsonMatch[0] : content)
+      );
 
       // Merge AI suggestions with our specific suggestions
       const combinedSuggestions = [
         ...specificSuggestions,
-        ...result.object.suggestions.map((s, index) => ({
+        ...parsed.suggestions.map((s, index) => ({
           ...s,
           id: String(specificSuggestions.length + index + 1), // Ensure unique IDs
         })),
@@ -339,8 +378,8 @@ Please return your response in the following JSON format:
 
       return NextResponse.json({
         suggestions: combinedSuggestions,
-        atsScore: result.object.atsScore,
-        overallFeedback: result.object.overallFeedback,
+        atsScore: parsed.atsScore,
+        overallFeedback: parsed.overallFeedback,
       });
     } catch (aiError) {
       console.error("AI generation error:", aiError);

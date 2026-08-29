@@ -18,7 +18,14 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters module issues
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
-    serverComponentsExternalPackages: [],
+    // Keep the headless-Chrome packages out of the webpack bundle: they ship
+    // source maps and dynamic requires webpack can't parse. Loaded at runtime
+    // by the PDF route instead.
+    serverComponentsExternalPackages: [
+      "puppeteer",
+      "puppeteer-core",
+      "chrome-aws-lambda",
+    ],
   },
 
   // Ensure API routes are included in build

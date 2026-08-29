@@ -6,12 +6,14 @@ import { useEffect } from "react";
 interface BodyWrapperProps {
   children: React.ReactNode;
   interClassName: string;
+  interVariable: string;
   cairoVariable: string;
 }
 
 export function BodyWrapper({
   children,
   interClassName,
+  interVariable,
   cairoVariable,
 }: BodyWrapperProps) {
   const { currentLanguage } = useLanguage();
@@ -24,15 +26,14 @@ export function BodyWrapper({
     html.setAttribute("dir", currentLanguage === "ar" ? "rtl" : "ltr");
     html.setAttribute("lang", currentLanguage === "ar" ? "ar" : "en");
 
-    // Apply appropriate font classes
-    if (currentLanguage === "ar") {
-      // Arabic: Use Cairo font
-      body.className = `${cairoVariable} cairo-font`;
-    } else {
-      // English: Use Inter font
-      body.className = `${interClassName} ${cairoVariable} font-inter`;
-    }
-  }, [currentLanguage, interClassName, cairoVariable]);
+    // Always keep BOTH font CSS variables defined on the body so that
+    // var(--font-inter)/var(--font-cairo) resolve regardless of language
+    // (e.g. .ltr-content inside Arabic pages). Only the active marker class
+    // changes which family is the default.
+    const base = `${interClassName} ${interVariable} ${cairoVariable}`;
+    body.className =
+      currentLanguage === "ar" ? `${base} cairo-font` : `${base} font-inter`;
+  }, [currentLanguage, interClassName, interVariable, cairoVariable]);
 
   return <>{children}</>;
 }
