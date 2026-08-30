@@ -124,20 +124,15 @@ export async function POST(request: NextRequest) {
 
   try {
     if (isServerless) {
-      const { default: chromium } = await import("chrome-aws-lambda");
-      const { default: puppeteerCore } = await import("puppeteer-core");
+      // @sparticuz/chromium ships a Lambda/Netlify-compatible Chromium that
+      // bundles the shared libraries the old chrome-aws-lambda build lacked
+      // (libnss3.so etc.). Note executablePath() is an async function here.
+      const chromium = (await import("@sparticuz/chromium")).default;
+      const puppeteerCore = (await import("puppeteer-core")).default;
       browser = await puppeteerCore.launch({
-        args: [
-          ...chromium.args,
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-          "--single-process",
-          "--no-zygote",
-        ],
+        args: [...chromium.args, "--disable-dev-shm-usage"],
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
+        executablePath: await chromium.executablePath(),
         headless: chromium.headless,
       });
     } else {

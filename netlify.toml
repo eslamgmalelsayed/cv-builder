@@ -11,9 +11,13 @@
   package = "@netlify/plugin-nextjs"
 
 [functions]
-  # Ensure serverless bundle can locate Chromium binary and puppeteer-core at runtime
+  # Keep the Chromium binary + puppeteer-core out of the esbuild bundle so they
+  # load from node_modules at runtime (the @sparticuz/chromium binary must not
+  # be bundled/mangled).
   node_bundler = "esbuild"
-  external_node_modules = ["chrome-aws-lambda", "puppeteer-core"]
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
+  # Ship the Brotli-compressed Chromium binary with the function bundle.
+  included_files = ["node_modules/@sparticuz/chromium/bin/**"]
 
 [[headers]]
   for = "/*"
@@ -86,4 +90,5 @@
 
 # Function-level overrides (ensure Next API route bundle includes chromium files)
 [functions."next_api_generate-pdf"]
-  external_node_modules = ["chrome-aws-lambda", "puppeteer-core"]
+  external_node_modules = ["@sparticuz/chromium", "puppeteer-core"]
+  included_files = ["node_modules/@sparticuz/chromium/bin/**"]
