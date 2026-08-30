@@ -20,11 +20,21 @@ const translations = {
 interface PDFExportButtonProps {
   cvData: any;
   language?: "en" | "ar";
+  direction?: "ltr" | "rtl";
+  themeColor?: string;
+  sectionOrder?: string[];
+  visibleSections?: Record<string, boolean>;
+  sectionNames?: Record<string, string>;
 }
 
 export function PDFExportButton({
   cvData,
   language = "en",
+  direction = "ltr",
+  themeColor = "theme-black",
+  sectionOrder,
+  visibleSections,
+  sectionNames,
 }: PDFExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { showAlert } = useAlertModal();
@@ -34,140 +44,48 @@ export function PDFExportButton({
     try {
       setIsGenerating(true);
 
-      // Create dynamic filename from CV data
-      const fullName = cvData?.personalInfo?.fullName || "Unknown";
-      const title = cvData?.personalInfo?.title || "";
+      // Build the download filename as "FullName_JobTitle". The job title comes
+      // from the headline title, falling back to the most recent experience
+      // entry, and finally a localized "Resume" label so a title is always part
+      // of the name.
+      const clean = (value: string) =>
+        value
+          .trim()
+          .replace(/[\\/:*?"<>|]+/g, "") // strip filesystem-unsafe chars
+          .replace(/\s+/g, "_")
+          .replace(/_+/g, "_")
+          .replace(/^_|_$/g, "");
 
-      // Use personal title first, then fall back to most recent job title
-      let jobTitle = title;
-      if (!jobTitle && cvData?.experience && cvData.experience.length > 0) {
-        // Use the first experience entry as the most recent job title
-        jobTitle = cvData.experience[0]?.jobTitle || "";
-      }
+      const fullName = clean(cvData?.personalInfo?.fullName || "") || "Unknown";
 
-      // Default to "CV" if no title is available
-      if (!jobTitle) {
-        jobTitle = "CV";
-      }
+      const experienceTitle = Array.isArray(cvData?.experience)
+        ? cvData.experience.find((e: any) => e?.jobTitle?.trim())?.jobTitle
+        : "";
+      const rawJobTitle =
+        cvData?.personalInfo?.title?.trim() ||
+        experienceTitle?.trim() ||
+        (language === "ar" ? "السيرة الذاتية" : "Resume");
+      const jobTitle = clean(rawJobTitle);
 
-      const dynamicFileName = `${fullName.replace(
-        /\s+/g,
-        "_"
-      )}_${jobTitle.replace(/\s+/g, "_")}`;
+      const dynamicFileName = `${fullName}_${jobTitle}`;
 
-      // Get the CV preview element
-      const cvPreviewElement = document.querySelector(
-        ".cv-preview"
-      ) as HTMLElement;
-      if (!cvPreviewElement) {
-        throw new Error("CV preview element not found");
-      }
-
-      // Get all stylesheets
-      const styleSheets = Array.from(document.styleSheets);
-      let allStyles = "";
-
-      styleSheets.forEach((styleSheet) => {
-        try {
-          if (styleSheet.cssRules) {
-            Array.from(styleSheet.cssRules).forEach((rule) => {
-              allStyles += rule.cssText + "\n";
-            });
-          }
-        } catch (e) {
-          // Handle CORS issues with external stylesheets
-          console.warn("Could not access stylesheet:", e);
-        }
-      });
-
-      // Create complete HTML with embedded styles
-      const html = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              ${allStyles}
-              body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-              .cv-preview { max-width: none; margin: 0; padding: 0 !important; }
-              
-              /* Reduce internal padding for PDF */
-              .cv-preview .p-8 { padding: 1rem !important; }
-              .cv-preview .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
-              .cv-preview .py-8 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-              
-              /* PDF-specific page break styles */
-              .cv-section { 
-                page-break-inside: avoid; 
-                break-inside: avoid;
-                margin-bottom: 1rem;
-              }
-              
-              .cv-section-header {
-                page-break-after: avoid;
-                break-after: avoid;
-              }
-              
-              .cv-item {
-                page-break-inside: avoid;
-                break-inside: avoid;
-                margin-bottom: 0.75rem;
-              }
-              
-              /* Ensure sections start fresh if needed */
-              .cv-section:not(:first-child) {
-                page-break-before: auto;
-                break-before: auto;
-              }
-              
-              /* Prevent orphaned headers */
-              h1, h2, h3 {
-                page-break-after: avoid;
-                break-after: avoid;
-              }
-              
-              /* Keep list items together when possible */
-              li {
-                page-break-inside: avoid;
-                break-inside: avoid;
-              }
-              
-              @media print {
-                body { margin: 0; padding: 0; }
-                .cv-preview { box-shadow: none; }
-                
-                /* Additional print-specific rules */
-                .cv-section { 
-                  page-break-inside: avoid; 
-                  margin-bottom: 1.5rem;
-                }
-                
-                .cv-section-header {
-                  page-break-after: avoid;
-                }
-                
-                .cv-item {
-                  page-break-inside: avoid;
-                  margin-bottom: 1rem;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            ${cvPreviewElement.outerHTML}
-          </body>
-        </html>
-      `;
-
-      // Send to server-side PDF generation
+      // Send the CV data as JSON. The server builds a clean, self-contained
+      // document from the shared template — deterministic, faithful to the
+      // preview, and far lighter than scraping the live DOM + all stylesheets.
       const response = await fetch("/api/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          html,
+          cvData,
           fileName: `${dynamicFileName}.pdf`,
+          sectionOrder,
+          visibleSections,
+          sectionNames,
+          language,
+          direction,
+          themeColor,
         }),
       });
 
@@ -202,8 +120,7 @@ export function PDFExportButton({
     <Button
       onClick={generatePDF}
       disabled={isGenerating}
-      variant="outline"
-      className="w-full sm:w-auto bg-white hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 border-gray-300 flex items-center gap-2"
+      className="flex w-full items-center justify-center gap-2 sm:w-auto"
     >
       {isGenerating ? (
         <>

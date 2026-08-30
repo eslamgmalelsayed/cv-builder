@@ -133,30 +133,33 @@ export function getTranslations(language: string): AppTranslations {
       },
       home: {
         hero: {
-          badge: "الآن مع الذكاء الاصطناعي",
-          title: "أنشئ سيرتك الذاتية",
-          subtitle: "في دقائق، وليس ساعات",
+          badge: "منشئ سير ذاتية بالذكاء الاصطناعي",
+          title: "اصنع سيرة ذاتية",
+          subtitle: "تفتح لك أبواب المقابلات",
           description:
-            "منشئ السيرة الذاتية المدعوم بالذكاء الاصطناعي الذي يساعدك في إنشاء سيرة ذاتية احترافية تجذب أرباب العمل.",
-          primaryButton: "ابدأ مجاناً",
+            "منصة CVIFI المجانية تساعدك على إنشاء سيرتك الذاتية بالعربية والإنجليزية: قوالب متوافقة مع أنظمة التتبع، واقتراحات ذكية بالذكاء الاصطناعي، وتصدير فوري بصيغة PDF — بدون تسجيل أو رسوم.",
+          primaryButton: "أنشئ سيرتي مجاناً",
           secondaryButton: "شاهد المعاينة",
-          trustIndicator: "موثوق من قبل أكثر من 10,000 باحث عن عمل",
+          trustIndicator: "يثق بنا أكثر من 10,000 باحث عن عمل في المنطقة",
         },
         features: {
-          title: "إنشاء سيرة ذاتية احترافية",
-          subtitle: "تبرز من بين الآخرين",
+          title: "كل ما تحتاجه لتتميّز",
+          subtitle: "سِيَر ذاتية احترافية مصمّمة لطريقة التوظيف الحديثة",
           items: [
             {
-              title: "تحسين لأنظمة التتبع",
-              description: "تأكد من رؤية سيرتك الذاتية من قبل أرباب العمل",
+              title: "تجاوز أنظمة التتبع",
+              description:
+                "تنسيق واضح وقابل للقراءة الآلية حتى تصل كل كلمة إلى المسؤول عن التوظيف.",
             },
             {
-              title: "اقتراحات بالذكاء الاصطناعي",
-              description: "احصل على نصائح وتحسينات ذكية لمحتواك",
+              title: "اكتبها بالذكاء الاصطناعي",
+              description:
+                "حوّل ملاحظاتك المبدئية إلى إنجازات مصاغة باحتراف خلال ثوانٍ.",
             },
             {
-              title: "تصدير فوري للPDF",
-              description: "حمل سيرتك الذاتية بتنسيق احترافي",
+              title: "PDF بدقة عالية",
+              description:
+                "حمّل ملف PDF جاهزاً للطباعة يطابق المعاينة تماماً — بالعربية أو الإنجليزية.",
             },
           ],
           badges: {
@@ -187,11 +190,11 @@ export function getTranslations(language: string): AppTranslations {
           ],
         },
         cta: {
-          title: "جاهز لإنشاء سيرتك الذاتية المثالية؟",
+          title: "وظيفة أحلامك تبدأ بسيرة ذاتية واحدة",
           description:
-            "انضم لآلاف المهنيين الناجحين الذين استخدموا منصتنا للحصول على وظائف أحلامهم.",
+            "انضم لآلاف الباحثين الذين أنشأوا سِيَرهم المميزة مع CVIFI — مجاناً، وبلغتين، وخلال دقائق.",
           button: "ابدأ الآن مجاناً",
-          disclaimer: "مجاني للاستخدام. لا حاجة لبطاقة ائتمانية.",
+          disclaimer: "مجاني بالكامل. لا حاجة لبطاقة ائتمانية.",
         },
         footer: {
           description:
@@ -269,30 +272,33 @@ export function getTranslations(language: string): AppTranslations {
       },
       home: {
         hero: {
-          badge: "Now with AI",
-          title: "Create Your CV",
-          subtitle: "In minutes, not hours",
+          badge: "AI-powered resume builder",
+          title: "Build a resume that",
+          subtitle: "gets you interviews",
           description:
-            "The AI-powered CV builder that helps you create a professional resume that gets you hired.",
-          primaryButton: "Start for Free",
+            "CVIFI is the free resume builder for job seekers in English and Arabic. ATS-ready templates, AI-powered writing help, and instant PDF export — no sign-up, no cost.",
+          primaryButton: "Build my resume — free",
           secondaryButton: "View Preview",
-          trustIndicator: "Trusted by 10,000+ job seekers",
+          trustIndicator: "Trusted by 10,000+ job seekers across the region",
         },
         features: {
-          title: "Build a Professional CV",
-          subtitle: "That stands out from the crowd",
+          title: "Everything you need to stand out",
+          subtitle: "Professional resumes, built for how hiring actually works today",
           items: [
             {
-              title: "ATS-Optimized",
-              description: "Ensure your CV gets seen by recruiters",
+              title: "Beat the ATS",
+              description:
+                "Clean, parseable formatting so applicant tracking systems read every word — and recruiters do too.",
             },
             {
-              title: "AI-Powered Suggestions",
-              description: "Get smart recommendations for your content",
+              title: "Write it with AI",
+              description:
+                "Turn rough notes into sharp, achievement-focused bullet points in seconds.",
             },
             {
-              title: "Instant PDF Export",
-              description: "Download your CV in professional format",
+              title: "Pixel-perfect PDF",
+              description:
+                "Download a crisp, print-ready PDF that matches your preview exactly — in English or Arabic.",
             },
           ],
           badges: {
@@ -323,11 +329,11 @@ export function getTranslations(language: string): AppTranslations {
           ],
         },
         cta: {
-          title: "Ready to create your perfect CV?",
+          title: "Your dream job is one resume away",
           description:
-            "Join thousands of successful professionals who used our platform to land their dream jobs.",
-          button: "Start Now for Free",
-          disclaimer: "Free to use. No credit card required.",
+            "Join thousands who built standout resumes with CVIFI — free, bilingual, and ready in minutes.",
+          button: "Start building — it's free",
+          disclaimer: "Completely free. No credit card required.",
         },
         footer: {
           description:
