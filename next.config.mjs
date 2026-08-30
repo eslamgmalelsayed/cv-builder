@@ -30,7 +30,7 @@ const nextConfig = {
     // function bundle for the PDF route — otherwise file tracing may drop it
     // and Chromium fails to launch at runtime.
     outputFileTracingIncludes: {
-      "/api/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**"],
+      "/api/generate-pdf": ["./node_modules/@sparticuz/chromium/**/*"],
     },
   },
 
