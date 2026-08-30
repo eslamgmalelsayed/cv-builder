@@ -24,8 +24,14 @@ const nextConfig = {
     serverComponentsExternalPackages: [
       "puppeteer",
       "puppeteer-core",
-      "chrome-aws-lambda",
+      "@sparticuz/chromium",
     ],
+    // Force the Chromium binary (Brotli archives in bin/) into the serverless
+    // function bundle for the PDF route — otherwise file tracing may drop it
+    // and Chromium fails to launch at runtime.
+    outputFileTracingIncludes: {
+      "/api/generate-pdf": ["./node_modules/@sparticuz/chromium/bin/**"],
+    },
   },
 
   // Ensure API routes are included in build
