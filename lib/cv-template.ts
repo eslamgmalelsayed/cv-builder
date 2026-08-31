@@ -370,8 +370,11 @@ export function buildCVStyles(themeColor = "theme-black"): string {
   .cv-skills>*+*{margin-top:12px;}
   .cv-skill-block{page-break-inside:avoid;break-inside:avoid;}
   @media print{
-    .cv-page{padding:0;}
+    @page{size:A4;margin:12mm 0;}
     body{margin:0;}
+    /* Vertical spacing comes from the @page margin; the side margins stay as
+       padding so the content never runs past the printable width. */
+    .cv-page{padding:0 15mm;max-width:none;width:auto;}
   }`;
 }
 
